@@ -1,0 +1,1242 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trip to Haikou & Kunming — Dynamic Infographic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-alt: #f1f5f9;
+      --border: #e2e8f0;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --haikou: #0d9488;
+      --haikou-soft: #f0fdfa;
+      --haikou-border: #99f6e4;
+      --kunming: #e11d48;
+      --kunming-soft: #fff1f2;
+      --kunming-border: #fecdd3;
+      --accent: #2563eb;
+      --amber: #d97706;
+      --amber-soft: #fffbeb;
+      --amber-border: #fde68a;
+      --green: #16a34a;
+      --green-soft: #f0fdf4;
+      --green-border: #bbf7d0;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 4px 12px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --font: 'Prompt', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    /* Hero Header */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f766e 100%);
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8fafc;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .source-pill:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+    .hero p {
+      margin: 0 0 24px;
+      color: #cbd5e1;
+      font-size: 15px;
+      max-width: 680px;
+    }
+
+    /* Route Diagram SVG inside Hero */
+    .route-visual {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+    .route-node {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .route-node.right {
+      justify-content: flex-end;
+      text-align: right;
+    }
+    .node-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .node-badge.haikou {
+      background: rgba(20, 184, 166, 0.25);
+      border: 1px solid #2dd4bf;
+      color: #5eead4;
+    }
+    .node-badge.kunming {
+      background: rgba(244, 63, 94, 0.25);
+      border: 1px solid #fb7185;
+      color: #fda4af;
+    }
+    .node-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #ffffff;
+    }
+    .node-sub {
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+    .route-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #94a3b8;
+      font-size: 12px;
+      gap: 4px;
+    }
+
+    /* Stats Quick Dashboard */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* Section & Controls */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-sub {
+      margin: 4px 0 0;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+
+    /* Destination Filter Tabs */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tab-btn {
+      font-family: var(--font);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover {
+      border-color: #cbd5e1;
+      background: #e2e8f0;
+    }
+    .tab-btn.active[data-city="all"] {
+      background: var(--ink);
+      color: #ffffff;
+      border-color: var(--ink);
+    }
+    .tab-btn.active[data-city="haikou"] {
+      background: var(--haikou);
+      color: #ffffff;
+      border-color: var(--haikou);
+    }
+    .tab-btn.active[data-city="kunming"] {
+      background: var(--kunming);
+      color: #ffffff;
+      border-color: var(--kunming);
+    }
+
+    /* City Comparison Infographic Grid */
+    .city-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .city-panel {
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .city-panel.haikou-theme {
+      background: var(--haikou-soft);
+      border-color: var(--haikou-border);
+    }
+    .city-panel.kunming-theme {
+      background: var(--kunming-soft);
+      border-color: var(--kunming-border);
+    }
+    .city-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .city-tag {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .haikou-theme .city-tag {
+      background: #ccfbf1;
+      color: #115e59;
+    }
+    .kunming-theme .city-tag {
+      background: #ffe4e6;
+      color: #9f1239;
+    }
+    .city-panel h3 {
+      margin: 6px 0 4px;
+      font-size: 20px;
+    }
+    .city-desc {
+      font-size: 13.5px;
+      color: #334155;
+      margin: 0 0 16px;
+    }
+    .spot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .spot-item {
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .spot-info h4 {
+      margin: 0 0 2px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .spot-info p {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .spot-cat {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--surface-alt);
+      color: #475569;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Interactive Day Timeline */
+    .day-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 20px;
+    }
+    .day-tab {
+      font-family: var(--font);
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .day-tab:hover {
+      border-color: #94a3b8;
+    }
+    .day-tab.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+    .day-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .day-dot.haikou { background: var(--haikou); }
+    .day-dot.kunming { background: var(--kunming); }
+    .day-tab.active .day-dot { background: #ffffff; }
+
+    .timeline-list {
+      position: relative;
+      padding-left: 24px;
+      border-left: 2px solid var(--border);
+      margin-left: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .timeline-card {
+      position: relative;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .timeline-card::before {
+      content: "";
+      position: absolute;
+      left: -31px;
+      top: 18px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 3px solid var(--accent);
+    }
+    .timeline-card.haikou::before {
+      border-color: var(--haikou);
+    }
+    .timeline-card.kunming::before {
+      border-color: var(--kunming);
+    }
+    .timeline-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .timeline-time {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: #dbeafe;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .timeline-card.haikou .timeline-time {
+      color: #0f766e;
+      background: #ccfbf1;
+    }
+    .timeline-card.kunming .timeline-time {
+      color: #be123c;
+      background: #ffe4e6;
+    }
+    .timeline-title {
+      font-size: 15.5px;
+      font-weight: 600;
+      margin: 4px 0;
+    }
+    .timeline-notes {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+    
+    /* Map Button */
+    .map-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: #475569;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .map-btn:hover {
+      background: var(--surface-alt);
+      border-color: #cbd5e1;
+      color: var(--ink);
+    }
+
+    /* Paste / Sync Custom Wanderlog Drawer */
+    .import-box {
+      background: var(--surface-alt);
+      border: 1px dashed #94a3b8;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+    .import-textarea {
+      width: 100%;
+      min-height: 110px;
+      font-family: var(--font);
+      font-size: 13.5px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      margin: 10px 0 12px;
+      resize: vertical;
+    }
+    .import-textarea:focus {
+      outline: 2px solid var(--accent);
+      border-color: transparent;
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn {
+      font-family: var(--font);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+    .btn-secondary {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--ink);
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    .sample-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: #15803d;
+      border: 1px solid var(--green-border);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 640px) {
+      .route-visual {
+        grid-template-columns: 1fr;
+        text-align: left;
+      }
+      .route-node.right {
+        justify-content: flex-start;
+        text-align: left;
+      }
+      .route-connector {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding-left: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero Banner -->
+    <header class="hero">
+      <div class="hero-top">
+        <a class="source-pill" href="https://wanderlog.com/journal/vamxdtvtjesnyi/trip-to-haikou-and-kunming/shared" target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          Wanderlog: trip-to-haikou-and-kunming
+        </a>
+        <span class="sample-badge" id="dataModeBadge">แผนการเดินทางจริง (9 วัน)</span>
+      </div>
+
+      <h1>Trip to Haikou &amp; Kunming</h1>
+      <p>Dynamic Infographic สรุปเส้นทางและไฮไลท์สำคัญระหว่างเมืองชายฝั่งทะเลไห่หนาน <strong>ไหโข่ว (Haikou)</strong> และนครแห่งฤดูใบไม้ผลิ <strong>คุนหมิง (Kunming)</strong> มณฑลยูนนาน</p>
+
+      <div class="route-visual">
+        <div class="route-node">
+          <div class="node-badge haikou">HK</div>
+          <div>
+            <div class="node-title">Haikou (ไหโข่ว)</div>
+            <div class="node-sub">Hainan Province • เมืองท่า &amp; สถาปัตยกรรมฉีโหลว</div>
+          </div>
+        </div>
+
+        <div class="route-connector">
+          <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
+            <path d="M4 12H72" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>
+            <path d="M66 6L74 12L66 18" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>China Route (UTC+8)</span>
+        </div>
+
+        <div class="route-node right">
+          <div>
+            <div class="node-title">Kunming (คุนหมิง)</div>
+            <div class="node-sub">Yunnan Province • วัดโบราณ &amp; ธรรมชาติยูนนาน</div>
+          </div>
+          <div class="node-badge kunming">KM</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-label">จำนวนวันเดินทาง</div>
+        <div class="stat-val">9 วัน</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">มณฑลที่ไปเยือน</div>
+        <div class="stat-val">2 มณฑล</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">จุดแวะเช็คอินรวม</div>
+        <div class="stat-val">28 สถานที่</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">ลิงก์แผนที่ Amap</div>
+        <div class="stat-val">15 จุด 🗺️</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Wanderlog Verified Highlights Comparison -->
+    <section class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">1. ไฮไลท์สถานที่สำคัญแยกตามเมือง (Wanderlog Guide Data)</h2>
+          <p class="section-sub">เปรียบเทียบจุดท่องเที่ยวและวัฒนธรรมสำคัญของทั้ง 2 เมืองจากฐานข้อมูล Wanderlog</p>
+        </div>
+        <div class="filter-bar" role="tablist" aria-label="ตัวกรองเมือง">
+          <button type="button" class="tab-btn active" data-city="all">ทั้ง 2 เมือง</button>
+          <button type="button" class="tab-btn" data-city="haikou">เฉพาะ Haikou (ไหโข่ว)</button>
+          <button type="button" class="tab-btn" data-city="kunming">เฉพาะ Kunming (คุนหมิง)</button>
+        </div>
+      </div>
+
+      <div class="city-grid" id="cityGrid">
+        <!-- Haikou Column -->
+        <div class="city-panel haikou-theme" data-city-panel="haikou">
+          <div class="city-panel-head">
+            <div>
+              <span class="city-tag">Hainan • Port City</span>
+              <h3>Haikou (ไหโข่ว)</h3>
+            </div>
+          </div>
+          <p class="city-desc">เมืองหลวงของมณฑลไห่หนานริมชายฝั่งทางเหนือ โดดเด่นด้วยย่านเมืองเก่าที่ผสมผสานสถาปัตยกรรมจีนและยุโรปโคโลเนียล</p>
+          <div class="spot-list">
+            <div class="spot-item">
+              <div class="spot-info">
+                <h4>Haikou Old Town Quarter (ย่านเมืองเก่าฉีโหลว)</h4>
+                <p>สถาปัตยกรรมผสมผสานจีนและยุโรปโคโลเนียลอันเป็นเอกลักษณ์ของเมืองท่าไหโข่ว</p>
+              </div>
+              <span class="spot-cat">Architecture</span>
+            </div>
+            <div class="spot-item">
+              <div class="spot-info">
+                <h4>Qilou Snack Street (ถนนคนเดินอาหารฉีโหลว)</h4>
+                <p>ศูนย์รวมสตรีทฟู้ดและอาหารท้องถิ่นขึ้นชื่อของเกาะไห่หนาน</p>
+              </div>
+              <span class="spot-cat">Local Food</span>
+            </div>
+            <div class="spot-item">
+              <div class="spot-info">
+                <h4>Hainan Provincial Museum (พิพิธภัณฑ์มณฑลไห่หนาน)</h4>
+                <p>จัดแสดงประวัติศาสตร์และวัฒนธรรมกลุ่มชาติพันธุ์บนเกาะไห่หนาน</p>
+              </div>
+              <span class="spot-cat">Museum</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kunming Column -->
+        <div class="city-panel kunming-theme" data-city-panel="kunming">
+          <div class="city-panel-head">
+            <div>
+              <span class="city-tag">Yunnan • Cultural Hub</span>
+              <h3>Kunming (คุนหมิง)</h3>
+            </div>
+          </div>
+          <p class="city-desc">ศูนย์กลางการท่องเที่ยวของยูนนาน โดดเด่นด้วยวัดพุทธและเต๋าเก่าแก่ สวนพฤกษศาสตร์ขนาดใหญ่ และอาหารยูนนาน (ขนมจีนข้ามสะพานและเห็ด)</p>
+          <div class="spot-list">
+            <div class="spot-item">
+              <div class="spot-info">
+                <h4>Yuantong Temple (วัดหยวนทง)</h4>
+                <p>วัดพุทธโบราณตั้งแต่ศตวรรษที่ 8 อายุกว่า 1,200 ปี เชิงเขาหยวนทง</p>
+              </div>
+              <span class="spot-cat">Historic Temple</span>
+            </div>
+            <div class="spot-item">
+              <div class="spot-info">
+                <h4>Golden Temple Park (ตำหนักทองจินเตี้ยน)</h4>
+                <p>วัดเต๋าสัมฤทธิ์ยุคศตวรรษที่ 17 บนเนินเขาหมิงเฟิ่ง ใหญ่ที่สุดในจีน (เข้าชมฟรี)</p>
+              </div>
+              <span class="spot-cat">Taoist Site</span>
+            </div>
+            <div class="spot-item">
+              <div class="spot-info">
+                <h4>World Horti-Expo Garden (สวนโลกคุนหมิง)</h4>
+                <p>สวนพฤกษศาสตร์ขนาด 220 เฮกตาร์ พื้นที่สีเขียวกว่า 80% พร้อม 5 อาคารนิทรรศการ</p>
+              </div>
+              <span class="spot-cat">Nature &amp; Park</span>
+            </div>
+            <div class="spot-item">
+              <div class="spot-info">
+                <h4>Yunnan Minority Village &amp; Guandu Ancient Town</h4>
+                <p>หมู่บ้านวัฒนธรรมชนเผ่ายูนนาน (ค่าเข้า 90¥ / รวมโชว์ 190¥) และเมืองโบราณกวนตู้</p>
+              </div>
+              <span class="spot-cat">Culture</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Interactive Day-by-Day Timeline -->
+    <section class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">2. Interactive Timeline รายวัน (Day-by-Day Flow)</h2>
+          <p class="section-sub" id="timelineSubtitle">แผนการเดินทางจริงของคุณที่อัปเดตแล้ว (กดสลับวันเพื่อดูตารางเวลาและแผนที่)</p>
+        </div>
+        <button type="button" class="btn btn-secondary" id="toggleImportBtn" style="font-size: 12.5px;">
+          📝 แก้ไข/วางข้อความใหม่
+        </button>
+      </div>
+
+      <!-- Paste / Sync Custom Wanderlog Drawer -->
+      <div class="import-box hidden" id="importArea">
+        <strong>แก้ไขหรือนำเข้าแผนการเดินทางใหม่:</strong>
+        <p style="margin: 4px 0 12px; font-size: 13px; color: var(--muted);">
+          คุณสามารถคัดลอกตารางข้อความจาก Wanderlog มาวางทับในช่องด้านล่างนี้ได้ตลอดเวลาเพื่อสร้าง Timeline ใหม่ครับ
+        </p>
+        <textarea id="rawItineraryInput" class="import-textarea" placeholder="Day 1 - Haikou
+09:00 Haikou Old Town Quarter
+12:30 Qilou Snack Street"></textarea>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="applyCustomBtn">สร้างแผนภาพจากข้อความใหม่</button>
+          <button type="button" class="btn btn-secondary" id="cancelImportBtn">ยกเลิก</button>
+        </div>
+      </div>
+
+      <!-- Day Selector Tabs -->
+      <div class="day-tabs" id="dayTabs" role="tablist" aria-label="เลือกวันเดินทาง"></div>
+
+      <!-- Day Stops Timeline -->
+      <div class="timeline-list" id="timelineList"></div>
+    </section>
+  </div>
+
+  <script>
+    // Real itinerary parsed from user query
+    const REAL_ITINERARY = [
+      {
+        dayLabel: "Sat 26 Dec",
+        city: "haikou",
+        cityLabel: "Haikou (ไหโข่ว)",
+        stops: [
+          {
+            time: "07:30 - 07:50",
+            title: "Hub Airport Parking",
+            notes: "ที่จอดรถสำรองสนามบินสุวรรณภูมิ บริการรถรับส่งสนามบิน (ใช้เวลาเดินทางประมาณ 31 นาที / 16 กม.)"
+          },
+          {
+            time: "08:00 AM",
+            title: "Suvarnabhumi Airport (ท่าอากาศยานสุวรรณภูมิ)",
+            notes: "เตรียมตัวเช็คอินเที่ยวบินต่างประเทศ"
+          },
+          {
+            time: "09:30 - 10:30",
+            title: "Miracle Lounge Suvarnabhumi Airport (Near Gate D5)",
+            notes: "พักผ่อนทานของว่างใน Miracle Lounge หน้าทางขึ้นเครื่อง"
+          },
+          {
+            time: "14:25 - 16:00",
+            title: "Haikou Meilan International Airport (สนามบินไหโข่ว เม่ยหลาน)",
+            notes: "เดินทางถึงสนามบินนานาชาติไหโข่ว เทอร์มินอล 2 มณฑลไห่หนาน",
+            mapUrl: "https://surl.amap.com/2o6ydgWK0va"
+          },
+          {
+            time: "Check-in Hotel",
+            title: "Aili Hotel (โรงแรมอ้ายลี่ คิวโหลว โอลด์ สตรีท)",
+            notes: "Aili Wisdom Hotel (Haikou Friendship Commercial Plaza Qilou Old Street Branch) - พักผ่อนเก็บกระเป๋า",
+            mapUrl: "https://surl.amap.com/q5w6cZQ1a2fd"
+          },
+          {
+            time: "18:00 - 18:30",
+            title: "Haikou Qilou Snack Street (ถนนของกินฉีโหลว)",
+            notes: "เดินเที่ยวชมของว่างและของกินเล่นท้องถิ่น"
+          },
+          {
+            time: "18:30 - 21:00",
+            title: "Qilou Old Street Wenchang Ji Restaurant (ร้านอาหารไก่วินเชียง ยงจี๋จี๋)",
+            notes: "Suxiaoying Wenchang Chicken Yongjiji Restaurant (Qilou Old Street Branch) - มื้อเย็นลิ้มลองเมนูไก่เวินชางขึ้นชื่อ (ค่าใช้จ่ายเฉลี่ยประมาณ ¥57/คน)",
+            mapUrl: "https://surl.amap.com/2ldmOXJQ1q7rs"
+          }
+        ]
+      },
+      {
+        dayLabel: "Sun 27 Dec",
+        city: "haikou",
+        cityLabel: "Haikou (ไหโข่ว)",
+        stops: [
+          {
+            time: "09:30 - 12:00",
+            title: "Haikou Volcanic Cluster Global Geopark (อุทยานธรณีวิทยาภูเขาไฟไหโข่ว)",
+            notes: "ศึกษาประวัติศาสตร์ทางธรณีวิทยาและธรรมชาติภูเขาไฟโบราณ (เดินทางประมาณ 20 นาที / 22 กม.)"
+          },
+          {
+            time: "14:30 - 17:30",
+            title: "Haikou International Duty-Free City (เมืองปลอดภาษีนานาชาติไหโข่ว)",
+            notes: "ช้อปปิ้งสินค้าแบรนด์เนมปลอดภาษีที่ห้างดิวตี้ฟรีที่ใหญ่ที่สุด"
+          },
+          {
+            time: "19:00 - 19:30",
+            title: "Xitian Temple & Snack Street (วัดซีเทียนและถนนของกินเล่น)",
+            notes: "กราบไหว้สิ่งศักดิ์สิทธิ์และแวะชิมสตรีทฟู้ดราคาประหยัดที่ซอยข้างวัด (ค่าใช้จ่ายประมาณ ¥27/คน)",
+            mapUrl: "https://surl.amap.com/2lwmIzkiH2KL"
+          },
+          {
+            time: "19:30 - 21:00",
+            title: "Fuyuanji Restaurant (ร้านไก่เวินชาง ฟู่หยวนจี๋)",
+            notes: "Yiqunfu Yuanji Wenchang Jidawang (Deshengsha Head Office) - อร่อยกับไก่เวินชางสูตรดั้งเดิม (เฉลี่ยประมาณ ¥65/คน)",
+            mapUrl: "https://surl.amap.com/z48KDCaJ1x5"
+          }
+        ]
+      },
+      {
+        dayLabel: "Mon 28 Dec",
+        city: "haikou",
+        cityLabel: "Haikou (ไหโข่ว)",
+        stops: [
+          {
+            time: "09:30 - 11:00",
+            title: "Yamei Traditional Hainan Rice Noodles Restaurant (ร้านขนมจีนไหหลำ ย่าเหมย)",
+            notes: "Yamei Traditional Hainan Rice Noodle Restaurant (Qilou Old Street Branch) - ชิมเส้นขนมจีนไหหลำสไตล์โบราณสุดอร่อย (เฉลี่ยเพียง ¥14/คน)",
+            mapUrl: "https://surl.amap.com/gM1OQRAj1BN"
+          },
+          {
+            time: "12:30 - 13:30",
+            title: "Hengda Beautiful Sha Parking Lot",
+            notes: "แวะจอดพักรถทำธุระเพื่อความสะดวกในการเดินทาง"
+          },
+          {
+            time: "14:30 - 15:30",
+            title: "Haikou Library (หอสมุดประชาชนไหโข่ว)",
+            notes: "แวะเยี่ยมชมสถาปัตยกรรมและแหล่งการเรียนรู้ของเมือง"
+          },
+          {
+            time: "16:00 - 17:00",
+            title: "Haikou Century Bridge (สะพานศตวรรษไหโข่ว)",
+            notes: "ชมทิวทัศน์ริมทะเลและสะพานข้ามอ่าวอันงดงามในช่วงพระอาทิตย์ตกดิน"
+          },
+          {
+            time: "18:00 - 21:00",
+            title: "Haida South Gate Night Market (ตลาดโต้รุ่งประตูใต้ ม.ไห่หนาน)",
+            notes: "海大南门小吃一条街 - เดินเลือกซื้อของกินยามค่ำคืนที่มีชื่อเสียงที่สุดในไหโข่ว (ค่าอาหารเฉลี่ย ¥45/คน)",
+            mapUrl: "https://surl.amap.com/2mlAgH8W12bIt"
+          }
+        ]
+      },
+      {
+        dayLabel: "Tue 29 Dec",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "Transit Flight",
+            title: "เดินทางข้ามมณฑลสู่ Kunming (คุนหมิง)",
+            notes: "เดินทางจากสนามบินไหโข่วบินลัดฟ้าสู่มหานครคุนหมิง ยูนนาน"
+          },
+          {
+            time: "19:30 - 21:00",
+            title: "Nanping Pedestrian Street (ถนนคนเดินหนานผิง)",
+            notes: "เดินเล่นย่านศูนย์กลางการค้ากลางเมืองคุนหมิง แหล่งช้อปปิ้งทันสมัย",
+            mapUrl: "https://surl.amap.com/3nN1ZggZS0ff"
+          },
+          {
+            time: "Dinner",
+            title: "Laodian Shanzhai Restaurant (ร้านอาหารลี่เจียง เหล่าเตี้ยนซานไจ้)",
+            notes: "Laodian Shanzhai Yunnan Nationality Characteristic Cai (Jinbi Branch) - ลิ้มลองอาหารพื้นเมืองชาติพันธุ์ยูนนานรสเลิศ (เฉลี่ย ¥62/คน)",
+            mapUrl: "https://surl.amap.com/2nmiMBIqY6AW"
+          }
+        ]
+      },
+      {
+        dayLabel: "Wed 30 Dec",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "10:00 - 12:30",
+            title: "Stone Forest Entrance (ทางเข้าป่าหินสือหลิน)",
+            notes: "เดินทางไปป่าหินมรดกโลกธรรมชาติอายุกว่า 270 ล้านปี (เดินทางประมาณ 1 ชม. 5 นาที / 87 กม.)"
+          },
+          {
+            time: "14:00 - 17:00",
+            title: "Jiuxiang Caves (ถ้ำจิ่วเซียง)",
+            notes: "九乡溶洞群 - ชมถ้ำหินงอกหินย้อยอันงดงามตระการตาและน้ำตกใต้ดินที่อลังการ"
+          },
+          {
+            time: "20:00 - 22:00",
+            title: "Kunming Old Street (ถนนคนเดินเมืองเก่าคุนหมิง)",
+            notes: "昆明老街 - สัมผัสย่านตึกโบราณอายุกกว่าร้อยปีที่ได้รับการอนุรักษ์อย่างงดงาม",
+            mapUrl: "https://surl.amap.com/2mRxOAHs1i0dT"
+          },
+          {
+            time: "Dinner",
+            title: "Qie Zi Qia Qia Restaurant (ร้านอาหารเจี่ยจื่อ เชี่ยเชี่ย)",
+            notes: "Qiezi Qiaqia Xin Yunnan Shan Yecai (Kunming Old Street Shop) - ทานอาหารป่ายูนนานรสชาติจัดจ้านร่วมสมัย (เฉลี่ย ¥54/คน)",
+            mapUrl: "https://surl.amap.com/4YMibOSpaj0"
+          }
+        ]
+      },
+      {
+        dayLabel: "Thu 31 Dec",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "10:30 - 12:30",
+            title: "Xishan Scenic Area (อุทยานเขาซีซาน/ประตูสวรรค์หลงเหมิน)",
+            notes: "ขึ้นกระเช้าลอยฟ้าชมทิวทัศน์ทะเลสาบเตียนฉือจากวิหารหินแกะสลักบนหน้าผาสูง"
+          },
+          {
+            time: "14:00 - 15:30",
+            title: "Dounan Flowers & Plants Market (ตลาดดอกไม้โต่วหนาน)",
+            notes: "แวะชมตลาดค้าส่งดอกไม้ที่ใหญ่ที่สุดในเอเชีย ตระการตาด้วยดอกไม้นานาพรรณในราคาขายส่ง"
+          },
+          {
+            time: "15:30 - 17:00",
+            title: "Laoyuhe Wetland Park (อุทยานพื้นที่ชุ่มน้ำเหล่าอวี่เหอ)",
+            notes: "เดินชมสะพานไม้ริมน้ำ ท่ามกลางแมกไม้ร่มรื่นริมทะเลสาบเตียนฉือ"
+          },
+          {
+            time: "17:00 - 19:30",
+            title: "Haiyancun (หมู่บ้านไห่เหยียน)",
+            notes: "สัมผัสวิถีชีวิตชาวประมงท้องถิ่นยูนนาน ริมทะเลสาบและรับลมชมพระอาทิตย์ตกดิน"
+          },
+          {
+            time: "Dinner",
+            title: "Grandmother Flavour Restaurant (ร้านคุณยายยูนนาน ยายไวแหลง)",
+            notes: "Grandmother Flavour Yunnan Caida Dangjia (Old Street Branch) - ชิมเมนูสูตรคุณยายสไตล์ต้นตำรับยูนนานแท้ ๆ (เฉลี่ย ¥60/คน)",
+            mapUrl: "https://surl.amap.com/1k9hv3s21rbgi"
+          }
+        ]
+      },
+      {
+        dayLabel: "Fri 01 Jan",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "09:00 - 10:00",
+            title: "Cuihu Park (สวนสาธารณะทะเลสาบเขียว)",
+            notes: "翠湖 - เดินเล่นพักผ่อนรอบทะเลสาบกลางเมืองคุนหมิง ชมฝูงนกนางนวลหัวดำที่บินอพยพมาพึ่งหนาว"
+          },
+          {
+            time: "10:30 - 11:30",
+            title: "Huang Gong Dong Jie (ถนนประวัติศาสตร์หวงกงกงเจี่ย)",
+            notes: "เดินเล่นถ่ายรูปในซอยที่มีตึกผนังสีเหลืองสไตล์คลาสสิกโดดเด่น"
+          },
+          {
+            time: "12:00 - 12:30",
+            title: "Wenlin Street (ถนนเหวินหลินเจี่ย)",
+            notes: "แวะเดินย่านถนนคาเฟ่และร้านหนังสือสุดเก๋ของคุนหมิง"
+          },
+          {
+            time: "12:30 - 14:00",
+            title: "Qiaoxiangyuan Cross-Bridge Noodles (ขนมจีนข้ามสะพานเฉียวเซียงหยวน)",
+            notes: "Jiangshi Brother Bridge Xiangyuan (Cuihu Branch) - ร้านขนมจีนข้ามสะพานแบรนด์ดังระดับร้อยปีของคุนหมิง (เฉลี่ย ¥37/คน)",
+            mapUrl: "https://surl.amap.com/2n8UxkuG114jU"
+          },
+          {
+            time: "15:00 - 16:00",
+            title: "Xun Jin Jie (ถนนสวินจินเจี่ย & ร้านกาแฟแกะ)",
+            notes: "Xiaoyang Coffee Lamb Coffee - แวะเช็คอินร้านกาแฟสไตล์มินิมอลสุดน่ารักชิว ๆ (เฉลี่ย ¥53/คน)",
+            mapUrl: "https://surl.amap.com/1z86pICJeyg"
+          },
+          {
+            time: "18:30 - 20:30",
+            title: "Shuangqiao Night Market (ตลาดโต้รุ่งซวงเฉียว)",
+            notes: "Shuangqiao Night Market Fengqing Street - ตลาดมืดคึกคักแหล่งชิมบาร์บีคิวปิ้งย่างสไตล์ยูนนาน (เฉลี่ย ¥45/คน)",
+            mapUrl: "https://surl.amap.com/2ntxSAsu1yb1D"
+          }
+        ]
+      },
+      {
+        dayLabel: "Sat 02 Jan",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "13:30 - 17:00",
+            title: "Kunming Changshui International Airport (สนามบินคุนหมิง ฉางสุ่ย)",
+            notes: "เช็คอินเดินทางกลับด้วยเที่ยวบินข้ามมณฑลไปยังสนามบินไหโข่ว"
+          },
+          {
+            time: "19:50 - 20:30",
+            title: "Haikou Meilan International Airport (สนามบินไหโข่ว เม่ยหลาน)",
+            notes: "เดินทางถึงไหโข่วโดยสวัสดิภาพ ดินแดนตอนใต้"
+          },
+          {
+            time: "21:00 PM",
+            title: "Check-in Haikou Meilan International Airport Hotel (โรงแรมสนามบินเม่ยหลาน)",
+            notes: "เช็คอินเพื่อความสะดวกในการบินกลับกรุงเทพฯ ในเช้าวันถัดไป"
+          }
+        ]
+      },
+      {
+        dayLabel: "Sun 03 Jan",
+        city: "haikou",
+        cityLabel: "Haikou (ไหโข่ว)",
+        stops: [
+          {
+            time: "14:30 - 16:00",
+            title: "Haikou Meilan International Airport (Northeast High Class Lounge)",
+            notes: "แวะทานอาหารว่างและเครื่องดื่มที่เลานจ์ระดับพรีเมียมก่อนขึ้นเครื่องเดินทางกลับ"
+          },
+          {
+            time: "19:30 PM",
+            title: "Hub Airport Parking (เดินทางถึงสุวรรณภูมิโดยสวัสดิภาพ)",
+            notes: "รับรถยนต์กลับบ้านด้วยความปลอดภัยจบทริปความประทับใจ ไหโข่ว-คุนหมิง"
+          }
+        ]
+      }
+    ];
+
+    let currentItinerary = JSON.parse(JSON.stringify(REAL_ITINERARY));
+    let activeDayIndex = 0;
+
+    const cityFilterBtns = document.querySelectorAll('.tab-btn[data-city]');
+    const cityPanels = document.querySelectorAll('[data-city-panel]');
+    const dayTabsEl = document.getElementById('dayTabs');
+    const timelineListEl = document.getElementById('timelineList');
+    const toggleImportBtn = document.getElementById('toggleImportBtn');
+    const importArea = document.getElementById('importArea');
+    const cancelImportBtn = document.getElementById('cancelImportBtn');
+    const rawItineraryInput = document.getElementById('rawItineraryInput');
+    const applyCustomBtn = document.getElementById('applyCustomBtn');
+    const dataModeBadge = document.getElementById('dataModeBadge');
+    const timelineSubtitle = document.getElementById('timelineSubtitle');
+
+    // City Filter Interaction
+    cityFilterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const selected = btn.getAttribute('data-city');
+        cityFilterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        cityPanels.forEach(panel => {
+          const panelCity = panel.getAttribute('data-city-panel');
+          if (selected === 'all' || selected === panelCity) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        });
+      });
+    });
+
+    // Toggle Import Drawer
+    toggleImportBtn.addEventListener('click', () => {
+      importArea.classList.toggle('hidden');
+      if (!importArea.classList.contains('hidden')) {
+        rawItineraryInput.focus();
+      }
+    });
+
+    cancelImportBtn.addEventListener('click', () => {
+      importArea.classList.add('hidden');
+    });
+
+    // Render Day Tabs & Timeline
+    function renderTimeline() {
+      dayTabsEl.innerHTML = '';
+      currentItinerary.forEach((dayObj, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'day-tab' + (idx === activeDayIndex ? ' active' : '');
+        const dot = document.createElement('span');
+        dot.className = 'day-dot ' + (dayObj.city === 'haikou' ? 'haikou' : 'kunming');
+        btn.appendChild(dot);
+        btn.appendChild(document.createTextNode(dayObj.dayLabel));
+        btn.addEventListener('click', () => {
+          activeDayIndex = idx;
+          renderTimeline();
+        });
+        dayTabsEl.appendChild(btn);
+      });
+
+      timelineListEl.innerHTML = '';
+      const activeDay = currentItinerary[activeDayIndex];
+      if (!activeDay || !activeDay.stops || !activeDay.stops.length) {
+        timelineListEl.innerHTML = '<p style="color: var(--muted); font-size: 14px; padding: 20px;">ยังไม่มีรายการสถานที่สำหรับวันนี้</p>';
+        return;
+      }
+
+      activeDay.stops.forEach(stop => {
+        const card = document.createElement('div');
+        card.className = 'timeline-card ' + (activeDay.city === 'haikou' ? 'haikou' : 'kunming');
+
+        const top = document.createElement('div');
+        top.className = 'timeline-top';
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'timeline-time';
+        timeSpan.textContent = stop.time || activeDay.cityLabel;
+
+        const citySpan = document.createElement('span');
+        citySpan.style.fontSize = '12px';
+        citySpan.style.color = 'var(--muted)';
+        citySpan.textContent = activeDay.cityLabel;
+
+        top.appendChild(timeSpan);
+        top.appendChild(citySpan);
+
+        const title = document.createElement('h4');
+        title.className = 'timeline-title';
+        title.textContent = stop.title;
+
+        const notes = document.createElement('p');
+        notes.className = 'timeline-notes';
+        notes.textContent = stop.notes || '';
+
+        card.appendChild(top);
+        card.appendChild(title);
+        if (stop.notes) {
+          card.appendChild(notes);
+        }
+
+        // Add map button if mapUrl exists
+        if (stop.mapUrl) {
+          const mapLink = document.createElement('a');
+          mapLink.href = stop.mapUrl;
+          mapLink.target = "_blank";
+          mapLink.rel = "noopener";
+          mapLink.className = "map-btn";
+          mapLink.innerHTML = `
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+              <line x1="9" y1="3" x2="9" y2="18"></line>
+              <line x1="15" y1="6" x2="15" y2="21"></line>
+            </svg>
+            เปิดแผนที่ Amap 🗺️
+          `;
+          card.appendChild(mapLink);
+        }
+
+        timelineListEl.appendChild(card);
+      });
+    }
+
+    // Parse Custom Pasted Wanderlog Text
+    function parseCustomText(text) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (!lines.length) return null;
+
+      const days = [];
+      let currentDay = null;
+
+      const dayHeaderRegex = /^(?:day\s*\d+|วันที่\s*\d+|วันแรก|วันที่หนึ่ง|mon|tue|wed|thu|fri|sat|sun)/i;
+
+      lines.forEach(line => {
+        if (dayHeaderRegex.test(line) || (line.endsWith(':') && line.length < 45)) {
+          const lower = line.toLowerCase();
+          const isHaikou = lower.includes('haikou') || lower.includes('ไหโข่ว') || lower.includes('ไห่หนาน');
+          currentDay = {
+            dayLabel: line.replace(/:$/, ''),
+            city: isHaikou ? 'haikou' : 'kunming',
+            cityLabel: isHaikou ? 'Haikou (ไหโข่ว)' : 'Kunming (คุนหมิง)',
+            stops: []
+          };
+          days.push(currentDay);
+        } else {
+          if (!currentDay) {
+            const lower = line.toLowerCase();
+            const isHaikou = lower.includes('haikou') || lower.includes('ไหโข่ว');
+            currentDay = {
+              dayLabel: 'Day 1',
+              city: isHaikou ? 'haikou' : 'kunming',
+              cityLabel: isHaikou ? 'Haikou (ไหโข่ว)' : 'Kunming (คุนหมิง)',
+              stops: []
+            };
+            days.push(currentDay);
+          }
+
+          // Match optional time like "09:00" or "09:00 - 10:30"
+          const timeMatch = line.match(/^(\d{1,2}[:.]\d{2}(?:\s*-\s*\d{1,2}[:.]\d{2})?|\S+ช่วง\S*)\s+(.+)$/);
+          let timeStr = 'จุดเช็คอิน';
+          let rest = line;
+          if (timeMatch) {
+            timeStr = timeMatch[1];
+            rest = timeMatch[2];
+          }
+
+          const parts = rest.split(/\s+[-–—]\s+/);
+          const title = parts[0].trim();
+          const notes = parts.slice(1).join(' - ').trim();
+
+          currentDay.stops.push({
+            time: timeStr,
+            title: title,
+            notes: notes
+          });
+        }
+      });
+
+      return days.filter(d => d.stops.length > 0);
+    }
+
+    applyCustomBtn.addEventListener('click', () => {
+      const raw = rawItineraryInput.value.trim();
+      const parsed = parseCustomText(raw);
+      if (parsed && parsed.length > 0) {
+        currentItinerary = parsed;
+        activeDayIndex = 0;
+        dataModeBadge.textContent = 'ข้อมูลจากแผนอัปเดตใหม่เรียบร้อยแล้ว';
+        dataModeBadge.style.background = '#dcfce7';
+        dataModeBadge.style.color = '#166534';
+        dataModeBadge.style.borderColor = '#86efac';
+        timelineSubtitle.textContent = 'กำลังแสดงตารางการเดินทางจากข้อความที่คุณวางใหม่ (' + parsed.length + ' วัน)';
+        importArea.classList.add('hidden');
+        renderTimeline();
+      } else {
+        rawItineraryInput.style.borderColor = '#e11d48';
+      }
+    });
+
+    renderTimeline();
+  </script>
+</body>
+</html>
