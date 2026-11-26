@@ -1,1450 +1,2570 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown to China Trip 2026: Haikou & Kunming</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>China Trip 2026: Haikou & Kunming</title>
+  
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Global SPA Switching */
+    .hidden {
+      display: none !important;
+    }
+
+    /* -------------------------------------------------------------
+       VIEW 1: COUNTDOWN VIEW STYLING (Prefix: cd-)
+       ------------------------------------------------------------- */
+    body.countdown-mode {
+      min-height: 100vh;
+      width: 100%;
+      background: #fdf8fb;
+      color: #334155;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+      padding: 1.5rem 1rem;
+      margin: 0;
+      font-family: 'Kanit', sans-serif;
+    }
+
+    /* Fireworks Canvas Overlay */
+    #fireworks-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Dual City Real Photo Background */
+    .bg-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: flex;
+      overflow: hidden;
+    }
+    .bg-haikou {
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 45%, #7dd3fc 75%, #38bdf8 100%);
+      position: relative;
+      overflow: hidden;
+      border-right: 2px solid rgba(255, 255, 255, 0.75);
+      transform: scale(1.02);
+      transition: transform 8s ease;
+    }
+    .bg-kunming {
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(180deg, #fbcfe8 0%, #fce7f3 42%, #e9d5ff 72%, #a7f3d0 100%);
+      position: relative;
+      overflow: hidden;
+      transform: scale(1.02);
+      transition: transform 8s ease;
+    }
+    .bg-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    @keyframes swayPalm {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(2deg); }
+    }
+    @keyframes driftWave {
+      0%, 100% { transform: translateX(0px); }
+      50% { transform: translateX(-16px); }
+    }
+    @keyframes driftCloud {
+      0%, 100% { transform: translateX(0px); }
+      50% { transform: translateX(20px); }
+    }
+
+    .palm-sway {
+      animation: swayPalm 5.5s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+    .wave-drift {
+      animation: driftWave 6.5s ease-in-out infinite;
+    }
+    .cloud-drift {
+      animation: driftCloud 14s ease-in-out infinite;
+    }
+
+    .scenery-label {
+      position: absolute;
+      bottom: 18px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      color: #334155;
+      box-shadow: 0 4px 15px rgba(148, 163, 184, 0.25);
+      backdrop-filter: blur(8px);
+      z-index: 2;
+    }
+    .bg-haikou .scenery-label { left: 20px; color: #0284c7; }
+    .bg-kunming .scenery-label { right: 20px; color: #db2777; }
+
+    /* Ambient Pastel Glow & Floating Elements */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.55;
+      animation: floatOrb 12s infinite alternate ease-in-out;
+    }
+    .orb-1 { top: 8%; left: 12%; width: 300px; height: 300px; background: #bae6fd; }
+    .orb-2 { bottom: 8%; right: 12%; width: 340px; height: 340px; background: #fbcfe8; animation-delay: -6s; }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, 40px) scale(1.1); }
+    }
+
+    /* Soft Bright Pastel Veil over Real Photos */
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        135deg,
+        rgba(224, 242, 254, 0.38) 0%,
+        rgba(255, 255, 255, 0.32) 50%,
+        rgba(252, 231, 243, 0.38) 100%
+      );
+      backdrop-filter: blur(1.5px);
+      z-index: 1;
+    }
+
+    /* Main Content Bright Pastel Glass Card */
+    .main-card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 960px;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 2px solid rgba(255, 255, 255, 0.92);
+      border-radius: 32px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 50px rgba(148, 163, 184, 0.28), 0 4px 16px rgba(244, 114, 182, 0.12);
+      text-align: center;
+    }
+
+    /* City Badges */
+    .city-badges {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(148, 163, 184, 0.12);
+    }
+    .badge-haikou {
+      color: #0284c7;
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+      border: 1px solid #7dd3fc;
+    }
+    .badge-kunming {
+      color: #db2777;
+      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+      border: 1px solid #f9a8d4;
+    }
+
+    /* Titles */
+    h1.countdown-title {
+      font-size: 2.3rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 0.4rem;
+      background: linear-gradient(135deg, #0284c7 0%, #7c3aed 50%, #db2777 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .target-time {
+      color: #475569;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 1.8rem;
+    }
+
+    /* Navigation CTA Button */
+    .cta-nav-container {
+      margin: 1.5rem 0 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    .cta-nav-btn {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #0d9488 0%, #2563eb 50%, #e11d48 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 36px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .cta-nav-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.45);
+    }
+    .cta-nav-btn i {
+      font-size: 1.2rem;
+      transition: transform 0.2s ease;
+    }
+    .cta-nav-btn:hover i {
+      transform: translateX(4px);
+    }
+
+    /* SVG Cartoon Section */
+    .group-illustration-container {
+      width: 100%;
+      background: linear-gradient(180deg, rgba(240, 249, 255, 0.88) 0%, rgba(253, 242, 248, 0.88) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: inset 0 2px 10px rgba(186, 230, 253, 0.35), 0 8px 24px rgba(148, 163, 184, 0.14);
+      border-radius: 24px;
+      padding: 1.4rem 0.8rem 0.8rem 0.8rem;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .group-svg {
+      width: 100%;
+      height: auto;
+      max-height: 255px;
+      display: block;
+      overflow: visible;
+    }
+    .svg-nickname-badge rect {
+      fill: rgba(255, 255, 255, 0.92);
+      stroke: #f9a8d4;
+      stroke-width: 1.2;
+      transition: all 0.25s ease;
+    }
+    .svg-nickname-badge text {
+      fill: #334155;
+      font-size: 11px;
+      font-weight: 600;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    .chibi-person:hover .svg-nickname-badge rect {
+      fill: #fce7f3;
+      stroke: #ec4899;
+    }
+
+    /* Nickname Row Under Characters */
+    .nicknames-row {
+      display: grid;
+      grid-template-columns: repeat(11, minmax(0, 1fr));
+      gap: 4px;
+      margin-top: 6px;
+      padding: 0 4px;
+      align-items: start;
+    }
+    .nickname-pill {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 3px 4px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: #334155;
+      text-align: center;
+      white-space: nowrap;
+      cursor: text;
+      transition: all 0.2s ease;
+      outline: none;
+      box-shadow: 0 2px 6px rgba(148, 163, 184, 0.12);
+      position: relative;
+    }
+    .nickname-pill:hover,
+    .nickname-pill.active-hover {
+      border-color: #f472b6;
+      background: #fdf2f8;
+      color: #be185d;
+      transform: translateY(-2px);
+    }
+    .nickname-pill:focus {
+      border-color: #38bdf8;
+      background: #ffffff;
+      color: #0369a1;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+      white-space: normal;
+      overflow: visible;
+    }
+
+    .chibi-bounce {
+      animation: gentleBounce 3.2s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+    .chibi-person {
+      cursor: pointer;
+      transition: filter 0.25s ease;
+    }
+    .chibi-person:hover {
+      filter: drop-shadow(0 6px 14px rgba(244, 114, 182, 0.45)) brightness(1.04);
+    }
+    .chibi-person:hover .chibi-bounce {
+      animation: happyJump 0.55s ease-in-out infinite alternate;
+    }
+
+    @keyframes gentleBounce {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(0.6deg); }
+    }
+    @keyframes happyJump {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-10px) scale(1.04); }
+    }
+    @keyframes floatSparkle {
+      0%, 100% { transform: translateY(0px) scale(0.9); opacity: 0.65; }
+      50% { transform: translateY(-6px) scale(1.15); opacity: 1; }
+    }
+    .sparkle-anim {
+      animation: floatSparkle 2.8s ease-in-out infinite;
+    }
+
+    .group-caption {
+      font-size: 0.92rem;
+      color: #64748b;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    /* Countdown Grid - Pastel Cards */
+    .timer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .timer-box {
+      border-radius: 22px;
+      padding: 1.2rem 0.5rem;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 8px 20px rgba(148, 163, 184, 0.14);
+    }
+    .timer-box:nth-child(1) {
+      background: linear-gradient(145deg, #e0f2fe 0%, #f0f9ff 100%);
+      border: 1.5px solid #bae6fd;
+    }
+    .timer-box:nth-child(2) {
+      background: linear-gradient(145deg, #fce7f3 0%, #fdf2f8 100%);
+      border: 1.5px solid #fbcfe8;
+    }
+    .timer-box:nth-child(3) {
+      background: linear-gradient(145deg, #f3e8ff 0%, #faf5ff 100%);
+      border: 1.5px solid #e9d5ff;
+    }
+    .timer-box:nth-child(4) {
+      background: linear-gradient(145deg, #dcfce7 0%, #f0fdf4 100%);
+      border: 1.5px solid #bbf7d0;
+    }
+    .timer-box:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(148, 163, 184, 0.22);
+    }
+    .timer-box.celebrating {
+      border-color: #facc15;
+      box-shadow: 0 0 24px rgba(250, 204, 21, 0.45);
+    }
+    .timer-number {
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-box:nth-child(1) .timer-number { color: #0284c7; }
+    .timer-box:nth-child(2) .timer-number { color: #db2777; }
+    .timer-box:nth-child(3) .timer-number { color: #7c3aed; }
+    .timer-box:nth-child(4) .timer-number { color: #059669; }
+    .timer-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+      letter-spacing: 1px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    /* Progress Bar Section */
+    .progress-card {
+      background: linear-gradient(135deg, rgba(240, 249, 255, 0.9) 0%, rgba(253, 242, 248, 0.9) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 20px rgba(148, 163, 184, 0.14);
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: #334155;
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+      position: relative;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8 0%, #a78bfa 50%, #f472b6 100%);
+      border-radius: 10px;
+      transition: width 1s ease-in-out;
+      box-shadow: 0 0 12px rgba(244, 114, 182, 0.45);
+    }
+    .progress-footer {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-top: 0.6rem;
+      font-weight: 500;
+    }
+
+
+    /* -------------------------------------------------------------
+       VIEW 2: INFOGRAPHIC SUMMARY VIEW STYLING
+       ------------------------------------------------------------- */
+    body.infographic-mode {
+      margin: 0;
+      font-family: 'Prompt', sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      display: block;
+      padding: 0;
+    }
+
+    /* SPA Container for View 2 */
+    .info-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    /* Back Button on Infographic View */
+    .back-btn-container {
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: flex-start;
+    }
+    .back-btn {
+      font-family: 'Prompt', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 9px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      box-shadow: var(--shadow);
+    }
+    .back-btn:hover {
+      background: var(--surface-alt);
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Header */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f766e 100%);
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8fafc;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .source-pill:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+    .hero p {
+      margin: 0 0 24px;
+      color: #cbd5e1;
+      font-size: 15px;
+      max-width: 680px;
+    }
+
+    /* Route Diagram SVG inside Hero */
+    .route-visual {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+    .route-node {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .route-node.right {
+      justify-content: flex-end;
+      text-align: right;
+    }
+    .node-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .node-badge.haikou {
+      background: rgba(20, 184, 166, 0.25);
+      border: 1px solid #2dd4bf;
+      color: #5eead4;
+    }
+    .node-badge.kunming {
+      background: rgba(244, 63, 94, 0.25);
+      border: 1px solid #fb7185;
+      color: #fda4af;
+    }
+    .node-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #ffffff;
+    }
+    .node-sub {
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+    .route-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #94a3b8;
+      font-size: 12px;
+      gap: 4px;
+    }
+
+    /* Stats Quick Dashboard */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* Section & Controls */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-sub {
+      margin: 4px 0 0;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+
+    /* Destination Filter Tabs */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tab-btn {
+      font-family: 'Prompt', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover {
+      border-color: #cbd5e1;
+      background: #e2e8f0;
+    }
+    .tab-btn.active[data-city="all"] {
+      background: var(--ink);
+      color: #ffffff;
+      border-color: var(--ink);
+    }
+    .tab-btn.active[data-city="haikou"] {
+      background: var(--haikou);
+      color: #ffffff;
+      border-color: var(--haikou);
+    }
+    .tab-btn.active[data-city="kunming"] {
+      background: var(--kunming);
+      color: #ffffff;
+      border-color: var(--kunming);
+    }
+
+    /* City Comparison Infographic Grid */
+    .city-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .city-panel {
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .city-panel.haikou-theme {
+      background: var(--haikou-soft);
+      border-color: var(--haikou-border);
+    }
+    .city-panel.kunming-theme {
+      background: var(--kunming-soft);
+      border-color: var(--kunming-border);
+    }
+    .city-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .city-tag {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .haikou-theme .city-tag {
+      background: #ccfbf1;
+      color: #115e59;
+    }
+    .kunming-theme .city-tag {
+      background: #ffe4e6;
+      color: #9f1239;
+    }
+    .city-panel h3 {
+      margin: 6px 0 4px;
+      font-size: 20px;
+    }
+    .city-desc {
+      font-size: 13.5px;
+      color: #334155;
+      margin: 0 0 16px;
+    }
+    .spot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .spot-item {
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .spot-info h4 {
+      margin: 0 0 2px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .spot-info p {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .spot-cat {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--surface-alt);
+      color: #475569;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Interactive Day Timeline */
+    .day-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 20px;
+    }
+    .day-tab {
+      font-family: 'Prompt', sans-serif;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .day-tab:hover {
+      border-color: #94a3b8;
+    }
+    .day-tab.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+    .day-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .day-dot.haikou { background: var(--haikou); }
+    .day-dot.kunming { background: var(--kunming); }
+    .day-tab.active .day-dot { background: #ffffff; }
+
+    .timeline-list {
+      position: relative;
+      padding-left: 24px;
+      border-left: 2px solid var(--border);
+      margin-left: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .timeline-card {
+      position: relative;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .timeline-card::before {
+      content: "";
+      position: absolute;
+      left: -31px;
+      top: 18px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 3px solid var(--accent);
+    }
+    .timeline-card.haikou::before {
+      border-color: var(--haikou);
+    }
+    .timeline-card.kunming::before {
+      border-color: var(--kunming);
+    }
+    .timeline-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .timeline-time {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: #dbeafe;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .timeline-card.haikou .timeline-time {
+      color: #0f766e;
+      background: #ccfbf1;
+    }
+    .timeline-card.kunming .timeline-time {
+      color: #be123c;
+      background: #ffe4e6;
+    }
+    .timeline-title {
+      font-size: 15.5px;
+      font-weight: 600;
+      margin: 4px 0;
+    }
+    .timeline-notes {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
     
-    <!-- Google Fonts & Font Awesome Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Kanit', sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            width: 100%;
-            background: #fdf8fb;
-            color: #334155;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow-x: hidden;
-            padding: 1.5rem 1rem;
-        }
-
-        /* Fireworks Canvas Overlay */
-        #fireworks-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        /* Dual City Real Photo Background (Haikou & Kunming) */
-        .bg-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            display: flex;
-            overflow: hidden;
-        }
-
-        .bg-haikou {
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 45%, #7dd3fc 75%, #38bdf8 100%);
-            position: relative;
-            overflow: hidden;
-            border-right: 2px solid rgba(255, 255, 255, 0.75);
-            transform: scale(1.02);
-            transition: transform 8s ease;
-        }
-
-        .bg-kunming {
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(180deg, #fbcfe8 0%, #fce7f3 42%, #e9d5ff 72%, #a7f3d0 100%);
-            position: relative;
-            overflow: hidden;
-            transform: scale(1.02);
-            transition: transform 8s ease;
-        }
-
-        .bg-photo {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            pointer-events: none;
-        }
-
-        @keyframes swayPalm {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(2deg); }
-        }
-
-        @keyframes driftWave {
-            0%, 100% { transform: translateX(0px); }
-            50% { transform: translateX(-16px); }
-        }
-
-        @keyframes driftCloud {
-            0%, 100% { transform: translateX(0px); }
-            50% { transform: translateX(20px); }
-        }
-
-        .palm-sway {
-            animation: swayPalm 5.5s ease-in-out infinite;
-            transform-origin: bottom center;
-        }
-
-        .wave-drift {
-            animation: driftWave 6.5s ease-in-out infinite;
-        }
-
-        .cloud-drift {
-            animation: driftCloud 14s ease-in-out infinite;
-        }
-
-        .scenery-label {
-            position: absolute;
-            bottom: 18px;
-            padding: 6px 16px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.4px;
-            background: rgba(255, 255, 255, 0.82);
-            border: 1px solid rgba(255, 255, 255, 0.95);
-            color: #334155;
-            box-shadow: 0 4px 15px rgba(148, 163, 184, 0.25);
-            backdrop-filter: blur(8px);
-            z-index: 2;
-        }
-
-        .bg-haikou .scenery-label { left: 20px; color: #0284c7; }
-        .bg-kunming .scenery-label { right: 20px; color: #db2777; }
-
-        /* Ambient Pastel Glow & Floating Elements */
-        .glow-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.55;
-            animation: floatOrb 12s infinite alternate ease-in-out;
-        }
-
-        .orb-1 { top: 8%; left: 12%; width: 300px; height: 300px; background: #bae6fd; }
-        .orb-2 { bottom: 8%; right: 12%; width: 340px; height: 340px; background: #fbcfe8; animation-delay: -6s; }
-
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 40px) scale(1.1); }
-        }
-
-        /* Soft Bright Pastel Veil over Real Photos */
-        .bg-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                135deg,
-                rgba(224, 242, 254, 0.38) 0%,
-                rgba(255, 255, 255, 0.32) 50%,
-                rgba(252, 231, 243, 0.38) 100%
-            );
-            backdrop-filter: blur(1.5px);
-            z-index: 1;
-        }
-
-        /* Main Content Bright Pastel Glass Card */
-        .main-card {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 960px;
-            background: rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
-            border: 2px solid rgba(255, 255, 255, 0.92);
-            border-radius: 32px;
-            padding: 2.5rem 2rem;
-            box-shadow: 0 20px 50px rgba(148, 163, 184, 0.28), 0 4px 16px rgba(244, 114, 182, 0.12);
-            text-align: center;
-        }
-
-        /* City Badges */
-        .city-badges {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 18px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(148, 163, 184, 0.12);
-        }
-
-        .badge-haikou {
-            color: #0284c7;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            border: 1px solid #7dd3fc;
-        }
-
-        .badge-kunming {
-            color: #db2777;
-            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-            border: 1px solid #f9a8d4;
-        }
-
-        /* Titles */
-        h1 {
-            font-size: 2.3rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 0.4rem;
-            background: linear-gradient(135deg, #0284c7 0%, #7c3aed 50%, #db2777 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .target-time {
-            color: #475569;
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 1.8rem;
-        }
-
-        /* SVG Cartoon Section */
-        .group-illustration-container {
-            width: 100%;
-            background: linear-gradient(180deg, rgba(240, 249, 255, 0.88) 0%, rgba(253, 242, 248, 0.88) 100%);
-            border: 1.5px solid rgba(255, 255, 255, 0.95);
-            box-shadow: inset 0 2px 10px rgba(186, 230, 253, 0.35), 0 8px 24px rgba(148, 163, 184, 0.14);
-            border-radius: 24px;
-            padding: 1.4rem 0.8rem 0.8rem 0.8rem;
-            margin-bottom: 2rem;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .group-svg {
-            width: 100%;
-            height: auto;
-            max-height: 255px;
-            display: block;
-            overflow: visible;
-        }
-
-        .svg-nickname-badge rect {
-            fill: rgba(255, 255, 255, 0.92);
-            stroke: #f9a8d4;
-            stroke-width: 1.2;
-            transition: all 0.25s ease;
-        }
-
-        .svg-nickname-badge text {
-            fill: #334155;
-            font-size: 11px;
-            font-weight: 600;
-            text-anchor: middle;
-            dominant-baseline: central;
-        }
-
-        .chibi-person:hover .svg-nickname-badge rect {
-            fill: #fce7f3;
-            stroke: #ec4899;
-        }
-
-        /* Nickname Row Under Characters */
-        .nicknames-row {
-            display: grid;
-            grid-template-columns: repeat(11, minmax(0, 1fr));
-            gap: 4px;
-            margin-top: 6px;
-            padding: 0 4px;
-            align-items: start;
-        }
-
-        .nickname-pill {
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid #cbd5e1;
-            border-radius: 999px;
-            padding: 3px 4px;
-            font-size: 0.76rem;
-            font-weight: 600;
-            color: #334155;
-            text-align: center;
-            white-space: nowrap;
-            cursor: text;
-            transition: all 0.2s ease;
-            outline: none;
-            box-shadow: 0 2px 6px rgba(148, 163, 184, 0.12);
-            position: relative;
-        }
-
-        .nickname-pill:hover,
-        .nickname-pill.active-hover {
-            border-color: #f472b6;
-            background: #fdf2f8;
-            color: #be185d;
-            transform: translateY(-2px);
-        }
-
-        .nickname-pill:focus {
-            border-color: #38bdf8;
-            background: #ffffff;
-            color: #0369a1;
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
-            white-space: normal;
-            overflow: visible;
-        }
-
-        .chibi-bounce {
-            animation: gentleBounce 3.2s ease-in-out infinite;
-            transform-origin: center bottom;
-        }
-
-        .chibi-person {
-            cursor: pointer;
-            transition: filter 0.25s ease;
-        }
-
-        .chibi-person:hover {
-            filter: drop-shadow(0 6px 14px rgba(244, 114, 182, 0.45)) brightness(1.04);
-        }
-
-        .chibi-person:hover .chibi-bounce {
-            animation: happyJump 0.55s ease-in-out infinite alternate;
-        }
-
-        @keyframes gentleBounce {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-4px) rotate(0.6deg); }
-        }
-
-        @keyframes happyJump {
-            0% { transform: translateY(0px) scale(1); }
-            100% { transform: translateY(-10px) scale(1.04); }
-        }
-
-        @keyframes floatSparkle {
-            0%, 100% { transform: translateY(0px) scale(0.9); opacity: 0.65; }
-            50% { transform: translateY(-6px) scale(1.15); opacity: 1; }
-        }
-
-        .sparkle-anim {
-            animation: floatSparkle 2.8s ease-in-out infinite;
-        }
-
-        .group-caption {
-            font-size: 0.92rem;
-            color: #64748b;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-
-        /* Countdown Grid - Pastel Cards */
-        .timer-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .timer-box {
-            border-radius: 22px;
-            padding: 1.2rem 0.5rem;
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 8px 20px rgba(148, 163, 184, 0.14);
-        }
-
-        .timer-box:nth-child(1) {
-            background: linear-gradient(145deg, #e0f2fe 0%, #f0f9ff 100%);
-            border: 1.5px solid #bae6fd;
-        }
-
-        .timer-box:nth-child(2) {
-            background: linear-gradient(145deg, #fce7f3 0%, #fdf2f8 100%);
-            border: 1.5px solid #fbcfe8;
-        }
-
-        .timer-box:nth-child(3) {
-            background: linear-gradient(145deg, #f3e8ff 0%, #faf5ff 100%);
-            border: 1.5px solid #e9d5ff;
-        }
-
-        .timer-box:nth-child(4) {
-            background: linear-gradient(145deg, #dcfce7 0%, #f0fdf4 100%);
-            border: 1.5px solid #bbf7d0;
-        }
-
-        .timer-box:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(148, 163, 184, 0.22);
-        }
-
-        .timer-box.celebrating {
-            border-color: #facc15;
-            box-shadow: 0 0 24px rgba(250, 204, 21, 0.45);
-        }
-
-        .timer-number {
-            font-size: 3rem;
-            font-weight: 700;
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .timer-box:nth-child(1) .timer-number { color: #0284c7; }
-        .timer-box:nth-child(2) .timer-number { color: #db2777; }
-        .timer-box:nth-child(3) .timer-number { color: #7c3aed; }
-        .timer-box:nth-child(4) .timer-number { color: #059669; }
-
-        .timer-label {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 0.5rem;
-            letter-spacing: 1px;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        /* Progress Bar Section */
-        .progress-card {
-            background: linear-gradient(135deg, rgba(240, 249, 255, 0.9) 0%, rgba(253, 242, 248, 0.9) 100%);
-            border: 1.5px solid rgba(255, 255, 255, 0.95);
-            box-shadow: 0 8px 20px rgba(148, 163, 184, 0.14);
-            border-radius: 20px;
-            padding: 1.2rem 1.5rem;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.95rem;
-            color: #334155;
-            margin-bottom: 0.6rem;
-            font-weight: 600;
-        }
-
-        .progress-bar-bg {
-            width: 100%;
-            height: 14px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #cbd5e1;
-            position: relative;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #38bdf8 0%, #a78bfa 50%, #f472b6 100%);
-            border-radius: 10px;
-            transition: width 1s ease-in-out;
-            box-shadow: 0 0 12px rgba(244, 114, 182, 0.45);
-        }
-
-        .progress-footer {
-            font-size: 0.82rem;
-            color: #64748b;
-            margin-top: 0.6rem;
-            font-weight: 500;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-card {
-                padding: 1.8rem 1.2rem;
-            }
-
-            h1 {
-                font-size: 1.7rem;
-            }
-
-            .target-time {
-                font-size: 0.95rem;
-            }
-
-            .timer-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.8rem;
-            }
-
-            .timer-number {
-                font-size: 2.3rem;
-            }
-
-            .progress-card {
-                padding: 1rem;
-            }
-
-            /* Method 3: Remove ellipsis (...) and fit full names in one single row on mobile */
-            .group-illustration-container {
-                padding: 1rem 0.25rem 0.7rem 0.25rem;
-            }
-
-            .nicknames-row {
-                gap: 2px;
-                padding: 0;
-                margin-top: 6px;
-            }
-
-            .nickname-pill {
-                font-size: 0.62rem;
-                padding: 2px 1px;
-                white-space: normal;
-                overflow: visible;
-                text-overflow: clip;
-                word-break: keep-all;
-                line-height: 1.2;
-                border-radius: 10px;
-            }
-        }
-    </style>
-<style data-link-removed-style>a[data-link-removed],a[href*="zPythonSafez"]:not([onclick]){pointer-events:none!important;cursor:default!important;opacity:.6}</style></head>
-<body>
-
+    /* Map Button */
+    .map-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: #475569;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .map-btn:hover {
+      background: var(--surface-alt);
+      border-color: #cbd5e1;
+      color: var(--ink);
+    }
+
+    /* Paste / Sync Custom Wanderlog Drawer */
+    .import-box {
+      background: var(--surface-alt);
+      border: 1px dashed #94a3b8;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+    .import-textarea {
+      width: 100%;
+      min-height: 110px;
+      font-family: 'Prompt', sans-serif;
+      font-size: 13.5px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      margin: 10px 0 12px;
+      resize: vertical;
+    }
+    .import-textarea:focus {
+      outline: 2px solid var(--accent);
+      border-color: transparent;
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn {
+      font-family: 'Prompt', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+    .btn-secondary {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--ink);
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    .sample-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: #15803d;
+      border: 1px solid var(--green-border);
+    }
+
+    /* -------------------------------------------------------------
+       RESPONSIVE ADAPTATIONS FOR VIEW 2
+       ------------------------------------------------------------- */
+    @media (max-width: 768px) {
+      .route-visual {
+        grid-template-columns: 1fr;
+        text-align: left;
+      }
+      .route-node.right {
+        justify-content: flex-start;
+        text-align: left;
+      }
+      .route-connector {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding-left: 12px;
+      }
+    }
+  </style>
+
+  <style data-link-removed-style>
+    a[data-link-removed], a[href*="zPythonSafez"]:not([onclick]) {
+      pointer-events: none !important;
+      cursor: default !important;
+      opacity: .6;
+    }
+  </style>
+</head>
+<body class="countdown-mode">
+
+  <!-- ===============================================================
+       SPA VIEW 1: COUNTDOWN TIMER PAGE
+       =============================================================== -->
+  <div id="view-countdown" class="spa-page">
     <!-- Fireworks Canvas (Plays when countdown reaches 0) -->
     <canvas id="fireworks-canvas" aria-hidden="true"></canvas>
 
     <!-- Dual Background (Real Scenic Photos of Haikou & Kunming) -->
     <div class="bg-container">
-        <!-- Haikou Real Photo -->
-        <div class="bg-haikou">
-            <img id="bg-img-haikou" class="bg-photo" src="" alt="วิวเมืองไห่โข่ว สะพาน Haikou Century Bridge" crossorigin="anonymous" />
-            <div class="scenery-label"><i class="fa-solid fa-umbrella-beach"></i> Haikou Century Bridge (ไห่โข่ว)</div>
-        </div>
+      <!-- Haikou Real Photo -->
+      <div class="bg-haikou">
+        <img id="bg-img-haikou" class="bg-photo" src="" alt="วิวเมืองไห่โข่ว สะพาน Haikou Century Bridge" crossorigin="anonymous" />
+        <div class="scenery-label"><i class="fa-solid fa-umbrella-beach"></i> Haikou Century Bridge (ไห่โข่ว)</div>
+      </div>
 
-        <!-- Kunming Real Photo -->
-        <div class="bg-kunming">
-            <img id="bg-img-kunming" class="bg-photo" src="" alt="วิวเมืองคุนหมิง สวนสาธารณะชุ่ยหู Green Lake Park" crossorigin="anonymous" />
-            <div class="scenery-label"><i class="fa-solid fa-mountain-sun"></i> Kunming Green Lake Park (คุนหมิง)</div>
-        </div>
+      <!-- Kunming Real Photo -->
+      <div class="bg-kunming">
+        <img id="bg-img-kunming" class="bg-photo" src="" alt="วิวเมืองคุนหมิง สวนสาธารณะชุ่ยหู Green Lake Park" crossorigin="anonymous" />
+        <div class="scenery-label"><i class="fa-solid fa-mountain-sun"></i> Kunming Green Lake Park (คุนหมิง)</div>
+      </div>
 
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
     </div>
+
     <div class="bg-overlay"></div>
 
     <!-- Main Card -->
     <div class="main-card">
+      <!-- City Badges -->
+      <div class="city-badges">
+        <div class="badge badge-haikou">
+          <i class="fa-solid fa-umbrella-beach"></i> Haikou (ไห่โข่ว)
+        </div>
+        <div class="badge badge-kunming">
+          <i class="fa-solid fa-mountain-sun"></i> Kunming (คุนหมิง)
+        </div>
+      </div>
 
-        <!-- City Badges -->
-        <div class="city-badges">
-            <div class="badge badge-haikou">
-                <i class="fa-solid fa-umbrella-beach"></i> Haikou (ไห่โข่ว)
-            </div>
-            <div class="badge badge-kunming">
-                <i class="fa-solid fa-mountain-sun"></i> Kunming (คุนหมิง)
-            </div>
+      <!-- Title -->
+      <h1 class="countdown-title">China trip 2026-2027</h1>
+      <p class="target-time" id="target-message">
+        เจอกันที่สนามบินสุวรรณภูมิชั้น 4 แถว M <br>วันที่ 26 ธันวาคม 2026 เวลา 7:30 น.
+      </p>
+
+      <!-- Button to switch to View 2 (Infographic) -->
+      <div class="cta-nav-container">
+        <button type="button" class="cta-nav-btn" onclick="navigateTo('infographic')">
+          <i class="fa-solid fa-map-location-dot"></i> ดูสรุปแผนการเดินทาง &amp; แผนที่รายวัน ➔
+        </button>
+      </div>
+
+      <!-- Cute Kawaii Chibi Group (11 People Inline SVG) -->
+      <div class="group-illustration-container">
+        <svg class="group-svg" viewBox="0 0 1050 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ครอบครัวและเพื่อน 11 คน สไตล์การ์ตูนสุดน่ารัก">
+          <defs>
+            <linearGradient id="groundGlow" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#38BDF8" stop-opacity=".18"/>
+              <stop offset=".5" stop-color="#F472B6" stop-opacity=".45"/>
+              <stop offset="1" stop-color="#A78BFA" stop-opacity=".18"/>
+            </linearGradient>
+            <radialGradient id="cheekBlush" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FF6B9D" stop-opacity="0.75"/>
+              <stop offset="100%" stop-color="#FF6B9D" stop-opacity="0"/>
+            </radialGradient>
+            <!-- Cute heart reusable symbol -->
+            <g id="mini-heart">
+              <path d="M0 3 C-2 -1, -7 0, -5 5 C-3 8, 0 10, 0 11 C0 10, 3 8, 5 5 C7 0, 2 -1, 0 3 Z" fill="#FB7185"/>
+            </g>
+            <!-- Cute sparkle star symbol -->
+            <g id="mini-star">
+              <path d="M0 -6 L1.5 -1.5 L6 0 L1.5 1.5 L0 6 L-1.5 1.5 L-6 0 L-1.5 -1.5 Z" fill="#FDE047"/>
+            </g>
+          </defs>
+
+          <!-- Floating Background Cute Sparkles & Hearts -->
+          <use href="#mini-star" x="75" y="22" class="sparkle-anim" style="animation-delay: 0.2s;" />
+          <use href="#mini-heart" x="172" y="18" class="sparkle-anim" style="animation-delay: 0.9s;" />
+          <use href="#mini-star" x="355" y="15" class="sparkle-anim" style="animation-delay: 1.5s;" />
+          <use href="#mini-heart" x="538" y="14" class="sparkle-anim" style="animation-delay: 0.4s;" />
+          <use href="#mini-star" x="725" y="18" class="sparkle-anim" style="animation-delay: 1.9s;" />
+          <use href="#mini-heart" x="905" y="22" class="sparkle-anim" style="animation-delay: 1.1s;" />
+          <use href="#mini-star" x="995" y="34" class="sparkle-anim" style="animation-delay: 0.6s;" />
+
+          <!-- Soft glowing ground stage at Y = 190 -->
+          <ellipse cx="525" cy="192" rx="495" ry="12" fill="url(#groundGlow)" opacity="0.45"/>
+          <path d="M18 190 Q525 185 1032 190" stroke="url(#groundGlow)" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+          <!-- Person 1: Cool Guy with Glasses & Panda Hat (scale 0.98 -> Y: 33.2) -->
+          <g transform="translate(16, 33.2) scale(0.98)" class="chibi-person" data-person-index="0">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 0s;">
+              <path d="M29 124 L28 151 M51 124 L52 151" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
+              <rect x="19" y="149" width="16" height="10" rx="5" fill="#38BDF8"/>
+              <rect x="45" y="149" width="16" height="10" rx="5" fill="#38BDF8"/>
+              <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#3B82F6"/>
+              <path d="M29 76 Q40 86 51 76" fill="#DBEAFE"/>
+              <path d="M19 84 Q4 70 9 54" stroke="#3B82F6" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="9" cy="52" r="5.5" fill="#FFE0C8"/>
+              <line x1="8" y1="54" x2="3" y2="10" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M3 11 L-15 18 L4 26 Z" fill="#EF4444"/>
+              <circle cx="-4" cy="18" r="2.2" fill="#FDE047"/>
+              <path d="M61 84 Q72 98 64 112" stroke="#3B82F6" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="63" cy="113" r="5.5" fill="#FFE0C8"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
+              <path d="M10 38 Q9 8 40 8 Q71 8 70 38 Q62 24 52 27 Q40 16 27 27 Q17 24 10 38 Z" fill="#27201C"/>
+              <circle cx="20" cy="12" r="7" fill="#1E293B"/>
+              <circle cx="60" cy="12" r="7" fill="#1E293B"/>
+              <path d="M16 24 Q40 6 64 24 Q40 19 16 24 Z" fill="#FFFFFF"/>
+              <ellipse cx="27" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
+              <ellipse cx="53" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
+              <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <circle cx="28.5" cy="45" r="1" fill="#FFFFFF"/>
+              <circle cx="54.5" cy="45" r="1" fill="#FFFFFF"/>
+              <g fill="none" stroke="#1E293B" stroke-width="2.3">
+                <circle cx="27" cy="43" r="9"/>
+                <circle cx="53" cy="43" r="9"/>
+                <path d="M36 43 Q40 40 44 43"/>
+              </g>
+              <ellipse cx="17" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <path d="M34 53 Q37 57 40 53 Q43 57 46 53" stroke="#9F3A38" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- Person 2: Sweet Girl in Pink Dress (scale 0.84 -> Y: 55.6) -->
+          <g transform="translate(109, 55.6) scale(0.84)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 0.25s;">
+              <path d="M9 42 Q4 90 14 98 L66 98 Q76 90 71 42 Z" fill="#6D412A"/>
+              <path d="M30 124 L29 151 M50 124 L51 151" stroke="#FFE4CE" stroke-width="9.5" stroke-linecap="round"/>
+              <path d="M25 140 H33 M47 140 H55" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+              <ellipse cx="28" cy="154" rx="8" ry="5" fill="#EC4899"/>
+              <ellipse cx="52" cy="154" rx="8" ry="5" fill="#EC4899"/>
+              <path d="M22 78 Q40 72 58 78 L68 126 Q40 134 12 126 Z" fill="#F472B6"/>
+              <path d="M12 122 Q26 129 40 122 Q54 129 68 122" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <ellipse cx="34" cy="79" rx="7" ry="4" fill="#FFFFFF" transform="rotate(-15 34 79)"/>
+              <ellipse cx="46" cy="79" rx="7" ry="4" fill="#FFFFFF" transform="rotate(15 46 79)"/>
+              <circle cx="40" cy="83" r="3.5" fill="#FB7185"/>
+              <path d="M21 84 Q10 98 18 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <path d="M59 84 Q70 94 58 104" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <rect x="51" y="92" width="13" height="18" rx="3" fill="#FDE68A" stroke="#FFFFFF" stroke-width="1.5"/>
+              <path d="M49 92 H66" stroke="#F472B6" stroke-width="3" stroke-linecap="round"/>
+              <line x1="57" y1="84" x2="57" y2="92" stroke="#EC4899" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="55" cy="106" r="1.4" fill="#451A03"/><circle cx="59" cy="107" r="1.4" fill="#451A03"/><circle cx="61" cy="104" r="1.4" fill="#451A03"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
+              <path d="M10 38 Q10 7 40 7 Q70 7 70 38 Q56 21 40 28 Q24 21 10 38 Z" fill="#6D412A"/>
+              <path d="M10 22 L4 16 L6 27 Z M10 22 L17 15 L16 25 Z" fill="#FB7185"/>
+              <circle cx="10" cy="21" r="3" fill="#FFF1F2"/>
+              <path d="M70 22 L76 16 L74 27 Z M70 22 L63 15 L64 25 Z" fill="#FB7185"/>
+              <circle cx="70" cy="21" r="3" fill="#FFF1F2"/>
+              <ellipse cx="27" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
+              <ellipse cx="53" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
+              <path d="M21 38 L18 35 M59 38 L62 35" stroke="#291D18" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="28.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
+              <circle cx="54.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
+              <ellipse cx="17" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
+              <path d="M35 52 Q40 60 45 52 Z" fill="#F43F5E"/>
+            </g>
+          </g>
+
+          <!-- Person 3: Warm Senior Uncle (scale 0.92 -> Y: 42.8) -->
+          <g transform="translate(202, 42.8) scale(0.92)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 0.5s;">
+              <path d="M29 124 L28 151 M51 124 L52 151" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
+              <rect x="19" y="149" width="16" height="10" rx="5" fill="#78350F"/>
+              <rect x="45" y="149" width="16" height="10" rx="5" fill="#78350F"/>
+              <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#F59E0B"/>
+              <path d="M34 76 L34 126 M46 76 L46 126" stroke="#FEF3C7" stroke-width="2.5"/>
+              <rect x="35" y="76" width="10" height="48" fill="#FEF3C7"/>
+              <circle cx="40" cy="92" r="2" fill="#B45309"/><circle cx="40" cy="104" r="2" fill="#B45309"/>
+              <path d="M19 84 Q8 98 16 112" stroke="#F59E0B" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="17" cy="113" r="5" fill="#F5CBA7"/>
+              <path d="M61 84 Q74 72 69 56" stroke="#F59E0B" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="69" cy="54" r="5" fill="#F5CBA7"/>
+              <circle cx="9" cy="44" r="6" fill="#F5CBA7"/>
+              <circle cx="71" cy="44" r="6" fill="#F5CBA7"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#F5CBA7"/>
+              <path d="M10 36 Q10 10 40 10 Q70 10 70 36 Q55 23 40 25 Q25 23 10 36 Z" fill="#94A3B8"/>
+              <ellipse cx="40" cy="21" rx="37" ry="7" fill="#D97706"/>
+              <path d="M17 20 Q20 3 40 3 Q60 3 63 20 Z" fill="#FBBF24"/>
+              <path d="M18 17 Q40 21 62 17" stroke="#EF4444" stroke-width="3.5" fill="none"/>
+              <path d="M21 34 Q27 31 32 34 M48 34 Q53 31 59 34" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <ellipse cx="27" cy="43" rx="4.3" ry="5.3" fill="#1E1B18"/>
+              <ellipse cx="53" cy="43" rx="4.3" ry="5.3" fill="#1E1B18"/>
+              <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <ellipse cx="17" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <path d="M33 52 Q40 59 47 52" stroke="#9F3A38" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- Person 4: Stylish Guy (scale 0.90 -> Y: 46.0) -->
+          <g transform="translate(295, 46.0) scale(0.90)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 0.75s;">
+              <path d="M29 124 L28 151 M51 124 L52 151" stroke="#1E293B" stroke-width="11" stroke-linecap="round"/>
+              <rect x="19" y="149" width="16" height="10" rx="5" fill="#06B6D4"/>
+              <rect x="45" y="149" width="16" height="10" rx="5" fill="#06B6D4"/>
+              <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#14B8A6"/>
+              <path d="M20 75 Q40 83 60 75 Q62 84 55 86 Q40 90 25 86 Q18 84 20 75 Z" fill="#F43F5E"/>
+              <rect x="44" y="82" width="9" height="22" rx="4" fill="#F43F5E"/>
+              <path d="M45 101 H52" stroke="#FFE4E6" stroke-width="2" stroke-linecap="round"/>
+              <path d="M19 84 Q8 98 16 112" stroke="#14B8A6" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="17" cy="113" r="5" fill="#FFE0C8"/>
+              <path d="M61 84 Q72 98 64 112" stroke="#14B8A6" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="63" cy="113" r="5" fill="#FFE0C8"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
+              <path d="M56 17 Q79 16 82 23 Q79 28 58 26 Z" fill="#1E293B"/>
+              <path d="M58 19 Q77 19 79 23" stroke="#38BDF8" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M10 38 Q9 18 40 16 Q71 18 70 38 Q58 22 45 25 Q30 16 10 38 Z" fill="#3B2820"/>
+              <path d="M11 25 Q12 4 40 4 Q68 4 69 25 Q40 21 11 25 Z" fill="#EF4444"/>
+              <path d="M11 25 Q40 21 69 25" stroke="#1E293B" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M31 23 A9 6 0 0 1 49 23 Z" fill="#3B2820"/>
+              <path d="M31 22.5 H49" stroke="#FACC15" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="40" cy="4.5" r="2.8" fill="#1E293B"/>
+              <ellipse cx="27" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
+              <ellipse cx="53" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
+              <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <g fill="none" stroke="#334155" stroke-width="2.3">
+                <rect x="17" y="35" width="20" height="15" rx="6"/>
+                <rect x="43" y="35" width="20" height="15" rx="6"/>
+                <path d="M37 42 Q40 39 43 42"/>
+              </g>
+              <ellipse cx="16" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <ellipse cx="64" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <path d="M34 53 Q40 59 46 53" stroke="#9F3A38" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- Person 5: Cheerful Guy with Camera (scale 0.94 -> Y: 39.6) -->
+          <g transform="translate(388, 39.6) scale(0.94)" class="chibi-person" data-person-index="4">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 1.0s;">
+              <path d="M29 124 L28 151 M51 124 L52 151" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
+              <rect x="19" y="149" width="16" height="10" rx="5" fill="#F97316"/>
+              <rect x="45" y="149" width="16" height="10" rx="5" fill="#F97316"/>
+              <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#FB923C"/>
+              <path d="M19 84 Q8 98 16 112" stroke="#FB923C" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="17" cy="113" r="5" fill="#FFE0C8"/>
+              <path d="M61 84 Q72 98 64 112" stroke="#FB923C" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="63" cy="113" r="5" fill="#FFE0C8"/>
+              <path d="M28 76 L33 104 M52 76 L47 104" stroke="#475569" stroke-width="2.2"/>
+              <rect x="29" y="98" width="22" height="16" rx="4" fill="#1E293B" stroke="#E2E8F0" stroke-width="1.5"/>
+              <circle cx="40" cy="106" r="5" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.5"/>
+              <rect x="44" y="95" width="5" height="3" rx="1" fill="#F43F5E"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
+              <path d="M10 38 Q8 8 40 7 Q72 8 70 38 Q58 20 46 24 Q35 12 23 25 Q15 22 10 38 Z" fill="#2D201A"/>
+              <ellipse cx="27" cy="43" rx="4.6" ry="5.6" fill="#1E1B18"/>
+              <ellipse cx="53" cy="43" rx="4.6" ry="5.6" fill="#1E1B18"/>
+              <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="28.5" cy="45" r="1" fill="#FFFFFF"/>
+              <circle cx="54.5" cy="45" r="1" fill="#FFFFFF"/>
+              <ellipse cx="17" cy="52" rx="6.2" ry="3.6" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6.2" ry="3.6" fill="url(#cheekBlush)"/>
+              <path d="M34 51 Q40 60 46 51 Z" fill="#F43F5E"/>
+            </g>
+          </g>
+
+          <!-- Person 6: Cute Girl with Bear Beret (scale 0.85 -> Y: 54.0) -->
+          <g transform="translate(481, 54.0) scale(0.85)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 1.25s;">
+              <path d="M8 42 Q3 90 14 100 L66 100 Q77 90 72 42 Z" fill="#4A2E21"/>
+              <path d="M30 124 L29 151 M50 124 L51 151" stroke="#FFE4CE" stroke-width="9.5" stroke-linecap="round"/>
+              <path d="M25 140 H33 M47 140 H55" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+              <ellipse cx="28" cy="154" rx="8" ry="5" fill="#8B5CF6"/>
+              <ellipse cx="52" cy="154" rx="8" ry="5" fill="#8B5CF6"/>
+              <path d="M22 78 Q40 72 58 78 L68 126 Q40 134 12 126 Z" fill="#A78BFA"/>
+              <path d="M12 122 Q26 129 40 122 Q54 129 68 122" stroke="#EDE9FE" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M35 81 L40 85 L45 81 L45 88 L40 85 L35 88 Z" fill="#F472B6"/>
+              <circle cx="40" cy="84.5" r="2.5" fill="#FBCFE8"/>
+              <path d="M21 84 Q9 96 18 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <path d="M59 84 Q71 96 62 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
+              <path d="M10 38 Q10 8 40 8 Q70 8 70 38 Q58 24 49 28 Q40 18 31 28 Q22 24 10 38 Z" fill="#4A2E21"/>
+              <circle cx="20" cy="10" r="6.5" fill="#C084FC"/>
+              <circle cx="60" cy="10" r="6.5" fill="#C084FC"/>
+              <ellipse cx="40" cy="12" rx="26" ry="9" fill="#C084FC"/>
+              <ellipse cx="27" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
+              <ellipse cx="53" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
+              <path d="M21 38 L18 35 M59 38 L62 35" stroke="#291D18" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="28.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
+              <circle cx="54.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
+              <ellipse cx="17" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
+              <path d="M34 53 Q37 57 40 53 Q43 57 46 53" stroke="#9F3A38" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- Person 7: Nature Lover in Mint Green (scale 0.90 -> Y: 46.0) -->
+          <g transform="translate(574, 46.0) scale(0.90)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 1.5s;">
+              <path d="M29 124 L28 151 M51 124 L52 151" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
+              <rect x="19" y="149" width="16" height="10" rx="5" fill="#10B981"/>
+              <rect x="45" y="149" width="16" height="10" rx="5" fill="#10B981"/>
+              <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#10B981"/>
+              <path d="M24 77 L56 118" stroke="#FEF3C7" stroke-width="4.5" stroke-linecap="round"/>
+              <circle cx="52" cy="113" r="8" fill="#FFFFFF" stroke="#1E293B" stroke-width="1.5"/>
+              <circle cx="46" cy="107" r="3" fill="#1E293B"/><circle cx="58" cy="107" r="3" fill="#1E293B"/>
+              <circle cx="49.5" cy="112" r="1.8" fill="#1E293B"/><circle cx="54.5" cy="112" r="1.8" fill="#1E293B"/>
+              <path d="M19 84 Q8 98 16 112" stroke="#10B981" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="17" cy="113" r="5" fill="#FFE0C8"/>
+              <path d="M61 84 Q72 98 64 112" stroke="#10B981" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="63" cy="113" r="5" fill="#FFE0C8"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
+              <path d="M10 38 Q9 8 40 8 Q71 8 70 38 Q56 21 43 24 Q28 14 10 38 Z" fill="#26201B"/>
+              <ellipse cx="27" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
+              <ellipse cx="53" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
+              <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <circle cx="28.5" cy="45" r="1" fill="#FFFFFF"/>
+              <circle cx="54.5" cy="45" r="1" fill="#FFFFFF"/>
+              <ellipse cx="17" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <path d="M34 53 Q40 59 46 53" stroke="#9F3A38" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- Person 8: Sporty Guy with Headphones (scale 0.92 -> Y: 42.8) -->
+          <g transform="translate(667, 42.8) scale(0.92)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 1.75s;">
+              <path d="M29 124 L28 151 M51 124 L52 151" stroke="#1E293B" stroke-width="11" stroke-linecap="round"/>
+              <rect x="19" y="149" width="16" height="10" rx="5" fill="#6366F1"/>
+              <rect x="45" y="149" width="16" height="10" rx="5" fill="#6366F1"/>
+              <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#6366F1"/>
+              <path d="M24 96 H56" stroke="#A5B4FC" stroke-width="4" stroke-linecap="round"/>
+              <ellipse cx="29" cy="78" rx="6" ry="4.5" fill="#F43F5E" stroke="#FFFFFF" stroke-width="1.5"/>
+              <ellipse cx="51" cy="78" rx="6" ry="4.5" fill="#F43F5E" stroke="#FFFFFF" stroke-width="1.5"/>
+              <path d="M19 84 Q8 98 16 112" stroke="#6366F1" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="17" cy="113" r="5" fill="#FFE0C8"/>
+              <path d="M61 84 Q74 70 69 54" stroke="#6366F1" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="69" cy="52" r="5" fill="#FFE0C8"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
+              <path d="M10 38 Q9 8 40 8 Q71 8 70 38 Q58 21 44 23 Q28 14 10 38 Z" fill="#3A281E"/>
+              <ellipse cx="27" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
+              <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
+              <circle cx="28.5" cy="45" r="1" fill="#FFFFFF"/>
+              <path d="M47 43 Q53 36 59 43" stroke="#1E1B18" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+              <ellipse cx="17" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
+              <path d="M34 52 Q40 59 46 52" stroke="#9F3A38" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- Person 9: Sweet Girl in Rose Pink Outfit (scale 0.92 -> Y: 42.8) -->
+          <g transform="translate(760, 42.8) scale(0.92)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 2.0s;">
+              <path d="M8 42 Q3 90 14 100 L66 100 Q77 90 72 42 Z" fill="#523225"/>
+              <path d="M30 124 L29 151 M50 124 L51 151" stroke="#FFE4CE" stroke-width="9.5" stroke-linecap="round"/>
+              <path d="M25 140 H33 M47 140 H55" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+              <ellipse cx="28" cy="154" rx="8" ry="5" fill="#F43F5E"/>
+              <ellipse cx="52" cy="154" rx="8" ry="5" fill="#F43F5E"/>
+              <path d="M22 78 Q40 72 58 78 L68 126 Q40 134 12 126 Z" fill="#FB7185"/>
+              <use href="#mini-heart" x="40" y="94" transform="scale(1.2) translate(-7, -14)"/>
+              <path d="M12 122 Q26 129 40 122 Q54 129 68 122" stroke="#FFE4E6" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M21 84 Q9 96 18 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <path d="M59 84 Q71 96 62 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
+              <path d="M10 38 Q10 8 40 8 Q70 8 70 38 Q56 21 40 27 Q24 21 10 38 Z" fill="#523225"/>
+              <g transform="translate(60, 22)">
+                <circle cx="0" cy="-4" r="3.5" fill="#FDE047"/>
+                <circle cx="4" cy="0" r="3.5" fill="#FDE047"/>
+                <circle cx="0" cy="4" r="3.5" fill="#FDE047"/>
+                <circle cx="-4" cy="0" r="3.5" fill="#FDE047"/>
+                <circle cx="0" cy="0" r="2.5" fill="#F97316"/>
+              </g>
+              <ellipse cx="27" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
+              <ellipse cx="53" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
+              <path d="M21 38 L18 35 M59 38 L62 35" stroke="#291D18" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="28.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
+              <circle cx="54.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
+              <ellipse cx="17" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
+              <path d="M34 53 Q40 59 46 53" stroke="#9F3A38" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- Person 10: Cute Girl with Double Space Buns (scale 0.84 -> Y: 55.6) -->
+          <g transform="translate(853, 55.6) scale(0.84)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 2.25s;">
+              <path d="M9 42 Q4 88 15 98 L65 98 Q76 88 71 42 Z" fill="#3E241E"/>
+              <path d="M30 124 L29 151 M50 124 L51 151" stroke="#FFE4CE" stroke-width="9.5" stroke-linecap="round"/>
+              <path d="M25 140 H33 M47 140 H55" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+              <ellipse cx="28" cy="154" rx="8" ry="5" fill="#EC4899"/>
+              <ellipse cx="52" cy="154" rx="8" ry="5" fill="#EC4899"/>
+              <path d="M22 78 Q40 72 58 78 L68 126 Q40 134 12 126 Z" fill="#F472B6"/>
+              <path d="M30 78 Q42 86 52 94" stroke="#FDE047" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <circle cx="36" cy="83" r="2.2" fill="#FDE047"/><circle cx="45" cy="90" r="2.2" fill="#FDE047"/>
+              <path d="M21 84 Q9 96 18 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <path d="M59 84 Q73 70 67 54" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
+              <circle cx="15" cy="12" r="10" fill="#3E241E"/>
+              <circle cx="65" cy="12" r="10" fill="#3E241E"/>
+              <path d="M8 19 Q15 24 22 19" stroke="#F43F5E" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <path d="M58 19 Q65 24 72 19" stroke="#F43F5E" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <path d="M10 38 Q10 8 40 8 Q70 8 70 38 Q56 21 40 27 Q24 21 10 38 Z" fill="#3E241E"/>
+              <ellipse cx="27" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
+              <ellipse cx="53" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
+              <path d="M21 38 L18 35 M59 38 L62 35" stroke="#291D18" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
+              <circle cx="28.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
+              <circle cx="54.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
+              <ellipse cx="17" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
+              <ellipse cx="63" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
+              <path d="M35 52 Q40 60 45 52 Z" fill="#F43F5E"/>
+            </g>
+          </g>
+
+          <!-- Person 11: Little Kid in Yellow Shirt (scale 0.74 -> Y: 71.6) -->
+          <g transform="translate(944, 71.6) scale(0.74)" class="chibi-person">
+            <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
+            <g class="chibi-bounce" style="animation-delay: 2.5s;">
+              <path d="M29 124 L28 151 M51 124 L52 151" stroke="#3B82F6" stroke-width="11" stroke-linecap="round"/>
+              <rect x="19" y="149" width="16" height="10" rx="5" fill="#EF4444"/>
+              <rect x="45" y="149" width="16" height="10" rx="5" fill="#EF4444"/>
+              <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#FACC15"/>
+              <path d="M24 90 H56 L60 125 Q40 131 20 125 Z" fill="#3B82F6"/>
+              <line x1="28" y1="76" x2="28" y2="94" stroke="#3B82F6" stroke-width="5" stroke-linecap="round"/>
+              <line x1="52" y1="76" x2="52" y2="94" stroke="#3B82F6" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="28" cy="92" r="2.5" fill="#FDE047"/>
+              <circle cx="52" cy="92" r="2.5" fill="#FDE047"/>
+              <path d="M19 84 Q4 70 10 52" stroke="#FACC15" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="10" cy="50" r="5.5" fill="#FFE4CE"/>
+              <path d="M61 84 Q76 70 70 52" stroke="#FACC15" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <circle cx="70" cy="50" r="5.5" fill="#FFE4CE"/>
+              <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
+              <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
+              <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
+              <path d="M12 36 Q12 10 40 10 Q68 10 68 36 Q54 22 40 25 Q26 22 12 36 Z" fill="#6B4226"/>
+              <path d="M18 20 Q40 2 62 20 Z" fill="#38BDF8"/>
+              <path d="M15 20 Q40 16 68 22" stroke="#F43F5E" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="40" cy="9" r="3" fill="#FDE047"/>
+              <ellipse cx="27" cy="43" rx="5" ry="6" fill="#1E1B18"/>
+              <ellipse cx="53" cy="43" rx="5" ry="6" fill="#1E1B18"/>
+              <circle cx="25" cy="40" r="2.3" fill="#FFFFFF"/>
+              <circle cx="51" cy="40" r="2.3" fill="#FFFFFF"/>
+              <circle cx="29" cy="45.5" r="1.2" fill="#FFFFFF"/>
+              <circle cx="55" cy="45.5" r="1.2" fill="#FFFFFF"/>
+              <ellipse cx="16" cy="52" rx="7" ry="4" fill="url(#cheekBlush)"/>
+              <ellipse cx="64" cy="52" rx="7" ry="4" fill="url(#cheekBlush)"/>
+              <path d="M33 51 Q40 62 47 51 Z" fill="#F43F5E"/>
+            </g>
+          </g>
+        </svg>
+
+        <!-- Nicknames Row -->
+        <div class="nicknames-row" id="nicknames-row" aria-label="ชื่อเล่นสมาชิกทั้ง 11 คน (คลิกเพื่อแก้ไขชื่อ)">
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="0" title="คลิกเพื่อแก้ไขชื่อเล่น">แป๊บ</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="1" title="คลิกเพื่อแก้ไขชื่อเล่น">หลี</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="2" title="คลิกเพื่อแก้ไขชื่อเล่น">เจ็กตู่</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="3" title="คลิกเพื่อแก้ไขชื่อเล่น">นัท</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="4" title="คลิกเพื่อแก้ไขชื่อเล่น">บอย</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="5" title="คลิกเพื่อแก้ไขชื่อเล่น">ปู</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="6" title="คลิกเพื่อแก้ไขชื่อเล่น">คอม</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="7" title="คลิกเพื่อแก้ไขชื่อเล่น">บอล</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="8" title="คลิกเพื่อแก้ไขชื่อเล่น">นก</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="9" title="คลิกเพื่อแก้ไขชื่อเล่น">ใยแก้ว</div>
+          <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="10" title="คลิกเพื่อแก้ไขชื่อเล่น">บอส</div>
         </div>
 
-        <!-- Title -->
-        <h1>China trip 2026-2027</h1>
-        <p class="target-time" id="target-message">
-            เจอกันที่สนามบินสุวรรณภูมิชั้น 4 แถว M <br>วันที่ 26 ธันวาคม 2026 เวลา 7:30</br>
-        </p>
+        <p class="group-caption">11 เซียนสำราญ เบิกฟ้าตะลุยแดนมังกร 2026</p>
+      </div>
 
-        <!-- Cute Kawaii Chibi Group (11 People Inline SVG) -->
-        <div class="group-illustration-container">
-            <svg class="group-svg" viewBox="0 0 1050 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ครอบครัวและเพื่อน 11 คน สไตล์การ์ตูนสุดน่ารัก">
-                <defs>
-                    <linearGradient id="groundGlow" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0" stop-color="#38BDF8" stop-opacity=".18"/>
-                        <stop offset=".5" stop-color="#F472B6" stop-opacity=".45"/>
-                        <stop offset="1" stop-color="#A78BFA" stop-opacity=".18"/>
-                    </linearGradient>
-                    <radialGradient id="cheekBlush" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stop-color="#FF6B9D" stop-opacity="0.75"/>
-                        <stop offset="100%" stop-color="#FF6B9D" stop-opacity="0"/>
-                    </radialGradient>
-                    <!-- Cute heart reusable symbol -->
-                    <g id="mini-heart">
-                        <path d="M0 3 C-2 -1, -7 0, -5 5 C-3 8, 0 10, 0 11 C0 10, 3 8, 5 5 C7 0, 2 -1, 0 3 Z" fill="#FB7185"/>
-                    </g>
-                    <!-- Cute sparkle star symbol -->
-                    <g id="mini-star">
-                        <path d="M0 -6 L1.5 -1.5 L6 0 L1.5 1.5 L0 6 L-1.5 1.5 L-6 0 L-1.5 -1.5 Z" fill="#FDE047"/>
-                    </g>
-                </defs>
-
-                <!-- Floating Background Cute Sparkles & Hearts -->
-                <use href="#mini-star" x="75" y="22" class="sparkle-anim" style="animation-delay: 0.2s;" />
-                <use href="#mini-heart" x="172" y="18" class="sparkle-anim" style="animation-delay: 0.9s;" />
-                <use href="#mini-star" x="355" y="15" class="sparkle-anim" style="animation-delay: 1.5s;" />
-                <use href="#mini-heart" x="538" y="14" class="sparkle-anim" style="animation-delay: 0.4s;" />
-                <use href="#mini-star" x="725" y="18" class="sparkle-anim" style="animation-delay: 1.9s;" />
-                <use href="#mini-heart" x="905" y="22" class="sparkle-anim" style="animation-delay: 1.1s;" />
-                <use href="#mini-star" x="995" y="34" class="sparkle-anim" style="animation-delay: 0.6s;" />
-
-                <!-- Soft glowing ground stage at Y = 190 -->
-                <ellipse cx="525" cy="192" rx="495" ry="12" fill="url(#groundGlow)" opacity="0.45"/>
-                <path d="M18 190 Q525 185 1032 190" stroke="url(#groundGlow)" stroke-width="5" fill="none" stroke-linecap="round"/>
-
-                <!-- =========================================================
-                     11 KAWAII CHIBI TRAVELERS (Baseline Feet at local Y=160)
-                     Formula: Y_translate = 190 - (160 * scale)
-                ========================================================== -->
-
-                <!-- Person 1: Cool Guy with Glasses & Panda Hat Holding China Trip Flag (scale 0.98 -> Y: 33.2) -->
-                <g transform="translate(16, 33.2) scale(0.98)" class="chibi-person" data-person-index="0">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 0s;">
-                        <!-- Legs & Cute Sneakers -->
-                        <path d="M29 124 L28 151 M51 124 L52 151" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
-                        <rect x="19" y="149" width="16" height="10" rx="5" fill="#38BDF8"/>
-                        <rect x="45" y="149" width="16" height="10" rx="5" fill="#38BDF8"/>
-                        <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Hoodie Body -->
-                        <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#3B82F6"/>
-                        <path d="M29 76 Q40 86 51 76" fill="#DBEAFE"/>
-                        <!-- Left Arm Holding Cute Tour Flag & Right Arm -->
-                        <path d="M19 84 Q4 70 9 54" stroke="#3B82F6" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="9" cy="52" r="5.5" fill="#FFE0C8"/>
-                        <!-- Mini Tour Guide Flag -->
-                        <line x1="8" y1="54" x2="3" y2="10" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
-                        <path d="M3 11 L-15 18 L4 26 Z" fill="#EF4444"/>
-                        <circle cx="-4" cy="18" r="2.2" fill="#FDE047"/>
-                        <path d="M61 84 Q72 98 64 112" stroke="#3B82F6" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="63" cy="113" r="5.5" fill="#FFE0C8"/>
-                        <!-- Chubby Kawaii Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
-                        <!-- Soft Hair -->
-                        <path d="M10 38 Q9 8 40 8 Q71 8 70 38 Q62 24 52 27 Q40 16 27 27 Q17 24 10 38 Z" fill="#27201C"/>
-                        <!-- Cute Panda Beanie Cap -->
-                        <circle cx="20" cy="12" r="7" fill="#1E293B"/>
-                        <circle cx="60" cy="12" r="7" fill="#1E293B"/>
-                        <path d="M16 24 Q40 6 64 24 Q40 19 16 24 Z" fill="#FFFFFF"/>
-                        <!-- Big Sparkly Anime Eyes -->
-                        <ellipse cx="27" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
-                        <ellipse cx="53" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
-                        <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <circle cx="28.5" cy="45" r="1" fill="#FFFFFF"/>
-                        <circle cx="54.5" cy="45" r="1" fill="#FFFFFF"/>
-                        <!-- Cute Round Glasses -->
-                        <g fill="none" stroke="#1E293B" stroke-width="2.3">
-                            <circle cx="27" cy="43" r="9"/>
-                            <circle cx="53" cy="43" r="9"/>
-                            <path d="M36 43 Q40 40 44 43"/>
-                        </g>
-                        <!-- Rosy Cheeks & Happy Cat Smile -->
-                        <ellipse cx="17" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <path d="M34 53 Q37 57 40 53 Q43 57 46 53" stroke="#9F3A38" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-                    </g>
-                </g>
-
-                <!-- Person 2: Sweet Girl in Pink Dress with Twin Bows & Boba Tea (scale 0.84 -> Y: 55.6) -->
-                <g transform="translate(109, 55.6) scale(0.84)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 0.25s;">
-                        <!-- Hair Back Long -->
-                        <path d="M9 42 Q4 90 14 98 L66 98 Q76 90 71 42 Z" fill="#6D412A"/>
-                        <!-- Legs & Mary Jane Shoes -->
-                        <path d="M30 124 L29 151 M50 124 L51 151" stroke="#FFE4CE" stroke-width="9.5" stroke-linecap="round"/>
-                        <path d="M25 140 H33 M47 140 H55" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
-                        <ellipse cx="28" cy="154" rx="8" ry="5" fill="#EC4899"/>
-                        <ellipse cx="52" cy="154" rx="8" ry="5" fill="#EC4899"/>
-                        <!-- Cute Flared Pink Dress & White Collar -->
-                        <path d="M22 78 Q40 72 58 78 L68 126 Q40 134 12 126 Z" fill="#F472B6"/>
-                        <path d="M12 122 Q26 129 40 122 Q54 129 68 122" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
-                        <ellipse cx="34" cy="79" rx="7" ry="4" fill="#FFFFFF" transform="rotate(-15 34 79)"/>
-                        <ellipse cx="46" cy="79" rx="7" ry="4" fill="#FFFFFF" transform="rotate(15 46 79)"/>
-                        <circle cx="40" cy="83" r="3.5" fill="#FB7185"/>
-                        <!-- Arms & Cute Bubble Tea Cup -->
-                        <path d="M21 84 Q10 98 18 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
-                        <path d="M59 84 Q70 94 58 104" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
-                        <!-- Boba Cup -->
-                        <rect x="51" y="92" width="13" height="18" rx="3" fill="#FDE68A" stroke="#FFFFFF" stroke-width="1.5"/>
-                        <path d="M49 92 H66" stroke="#F472B6" stroke-width="3" stroke-linecap="round"/>
-                        <line x1="57" y1="84" x2="57" y2="92" stroke="#EC4899" stroke-width="2.5" stroke-linecap="round"/>
-                        <circle cx="55" cy="106" r="1.4" fill="#451A03"/><circle cx="59" cy="107" r="1.4" fill="#451A03"/><circle cx="61" cy="104" r="1.4" fill="#451A03"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
-                        <!-- Cute Bangs & Pink Hair Bows -->
-                        <path d="M10 38 Q10 7 40 7 Q70 7 70 38 Q56 21 40 28 Q24 21 10 38 Z" fill="#6D412A"/>
-                        <path d="M10 22 L4 16 L6 27 Z M10 22 L17 15 L16 25 Z" fill="#FB7185"/>
-                        <circle cx="10" cy="21" r="3" fill="#FFF1F2"/>
-                        <path d="M70 22 L76 16 L74 27 Z M70 22 L63 15 L64 25 Z" fill="#FB7185"/>
-                        <circle cx="70" cy="21" r="3" fill="#FFF1F2"/>
-                        <!-- Big Sparkly Eyes with Lashes -->
-                        <ellipse cx="27" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
-                        <ellipse cx="53" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
-                        <path d="M21 38 L18 35 M59 38 L62 35" stroke="#291D18" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="28.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
-                        <circle cx="54.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
-                        <!-- Cheeks & Open Happy Mouth -->
-                        <ellipse cx="17" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
-                        <path d="M35 52 Q40 60 45 52 Z" fill="#F43F5E"/>
-                    </g>
-                </g>
-
-                <!-- Person 3: Warm Senior Uncle in Explorer Bucket Hat (scale 0.92 -> Y: 42.8) -->
-                <g transform="translate(202, 42.8) scale(0.92)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 0.5s;">
-                        <!-- Legs & Boots -->
-                        <path d="M29 124 L28 151 M51 124 L52 151" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
-                        <rect x="19" y="149" width="16" height="10" rx="5" fill="#78350F"/>
-                        <rect x="45" y="149" width="16" height="10" rx="5" fill="#78350F"/>
-                        <!-- Cardigan & Scarf -->
-                        <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#F59E0B"/>
-                        <path d="M34 76 L34 126 M46 76 L46 126" stroke="#FEF3C7" stroke-width="2.5"/>
-                        <rect x="35" y="76" width="10" height="48" fill="#FEF3C7"/>
-                        <circle cx="40" cy="92" r="2" fill="#B45309"/><circle cx="40" cy="104" r="2" fill="#B45309"/>
-                        <!-- Arms -->
-                        <path d="M19 84 Q8 98 16 112" stroke="#F59E0B" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="17" cy="113" r="5" fill="#F5CBA7"/>
-                        <path d="M61 84 Q74 72 69 56" stroke="#F59E0B" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="69" cy="54" r="5" fill="#F5CBA7"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#F5CBA7"/>
-                        <circle cx="71" cy="44" r="6" fill="#F5CBA7"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#F5CBA7"/>
-                        <!-- Silver Hair & Cute Bucket Sun Hat -->
-                        <path d="M10 36 Q10 10 40 10 Q70 10 70 36 Q55 23 40 25 Q25 23 10 36 Z" fill="#94A3B8"/>
-                        <ellipse cx="40" cy="21" rx="37" ry="7" fill="#D97706"/>
-                        <path d="M17 20 Q20 3 40 3 Q60 3 63 20 Z" fill="#FBBF24"/>
-                        <path d="M18 17 Q40 21 62 17" stroke="#EF4444" stroke-width="3.5" fill="none"/>
-                        <!-- Gentle Happy Curved Eyes & Cute Eyebrows -->
-                        <path d="M21 34 Q27 31 32 34 M48 34 Q53 31 59 34" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                        <ellipse cx="27" cy="43" rx="4.3" ry="5.3" fill="#1E1B18"/>
-                        <ellipse cx="53" cy="43" rx="4.3" ry="5.3" fill="#1E1B18"/>
-                        <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <!-- Cheeks & Warm Smile -->
-                        <ellipse cx="17" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <path d="M33 52 Q40 59 47 52" stroke="#9F3A38" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                    </g>
-                </g>
-
-                <!-- Person 4: Stylish Guy with Glasses & Teal Jacket + Red Scarf (scale 0.90 -> Y: 46.0) -->
-                <g transform="translate(295, 46.0) scale(0.90)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 0.75s;">
-                        <!-- Legs & Sneakers -->
-                        <path d="M29 124 L28 151 M51 124 L52 151" stroke="#1E293B" stroke-width="11" stroke-linecap="round"/>
-                        <rect x="19" y="149" width="16" height="10" rx="5" fill="#06B6D4"/>
-                        <rect x="45" y="149" width="16" height="10" rx="5" fill="#06B6D4"/>
-                        <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Teal Jacket & Cozy Red Scarf -->
-                        <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#14B8A6"/>
-                        <path d="M20 75 Q40 83 60 75 Q62 84 55 86 Q40 90 25 86 Q18 84 20 75 Z" fill="#F43F5E"/>
-                        <rect x="44" y="82" width="9" height="22" rx="4" fill="#F43F5E"/>
-                        <path d="M45 101 H52" stroke="#FFE4E6" stroke-width="2" stroke-linecap="round"/>
-                        <!-- Arms -->
-                        <path d="M19 84 Q8 98 16 112" stroke="#14B8A6" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="17" cy="113" r="5" fill="#FFE0C8"/>
-                        <path d="M61 84 Q72 98 64 112" stroke="#14B8A6" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="63" cy="113" r="5" fill="#FFE0C8"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
-                        <!-- Backwards Cap Visor (Sticking out to the right/back) -->
-                        <path d="M56 17 Q79 16 82 23 Q79 28 58 26 Z" fill="#1E293B"/>
-                        <path d="M58 19 Q77 19 79 23" stroke="#38BDF8" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        <!-- Fluffy Hair peeking under Cap -->
-                        <path d="M10 38 Q9 18 40 16 Q71 18 70 38 Q58 22 45 25 Q30 16 10 38 Z" fill="#3B2820"/>
-                        <!-- Backwards Baseball Cap Dome & Snapback Strap -->
-                        <path d="M11 25 Q12 4 40 4 Q68 4 69 25 Q40 21 11 25 Z" fill="#EF4444"/>
-                        <path d="M11 25 Q40 21 69 25" stroke="#1E293B" stroke-width="3" fill="none" stroke-linecap="round"/>
-                        <!-- Front Snapback Cutout & Strap Detail -->
-                        <path d="M31 23 A9 6 0 0 1 49 23 Z" fill="#3B2820"/>
-                        <path d="M31 22.5 H49" stroke="#FACC15" stroke-width="2.5" stroke-linecap="round"/>
-                        <circle cx="40" cy="4.5" r="2.8" fill="#1E293B"/>
-                        <!-- Sparkly Eyes & Glasses -->
-                        <ellipse cx="27" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
-                        <ellipse cx="53" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
-                        <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <g fill="none" stroke="#334155" stroke-width="2.3">
-                            <rect x="17" y="35" width="20" height="15" rx="6"/>
-                            <rect x="43" y="35" width="20" height="15" rx="6"/>
-                            <path d="M37 42 Q40 39 43 42"/>
-                        </g>
-                        <!-- Blush & Smile -->
-                        <ellipse cx="16" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <ellipse cx="64" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <path d="M34 53 Q40 59 46 53" stroke="#9F3A38" stroke-width="2.3" fill="none" stroke-linecap="round"/>
-                    </g>
-                </g>
-
-                <!-- Person 5: Cheerful Guy in Sunny Hoodie with Camera (scale 0.94 -> Y: 39.6) -->
-                <g transform="translate(388, 39.6) scale(0.94)" class="chibi-person" data-person-index="4">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 1.0s;">
-                        <!-- Legs & Sneakers -->
-                        <path d="M29 124 L28 151 M51 124 L52 151" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
-                        <rect x="19" y="149" width="16" height="10" rx="5" fill="#F97316"/>
-                        <rect x="45" y="149" width="16" height="10" rx="5" fill="#F97316"/>
-                        <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Sunny Orange-Gold Hoodie -->
-                        <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#FB923C"/>
-                        <!-- Left Arm & Right Arm -->
-                        <path d="M19 84 Q8 98 16 112" stroke="#FB923C" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="17" cy="113" r="5" fill="#FFE0C8"/>
-                        <path d="M61 84 Q72 98 64 112" stroke="#FB923C" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="63" cy="113" r="5" fill="#FFE0C8"/>
-                        <!-- Camera Strap & Cute Camera -->
-                        <path d="M28 76 L33 104 M52 76 L47 104" stroke="#475569" stroke-width="2.2"/>
-                        <rect x="29" y="98" width="22" height="16" rx="4" fill="#1E293B" stroke="#E2E8F0" stroke-width="1.5"/>
-                        <circle cx="40" cy="106" r="5" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.5"/>
-                        <rect x="44" y="95" width="5" height="3" rx="1" fill="#F43F5E"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
-                        <!-- Spiky Cute Hair -->
-                        <path d="M10 38 Q8 8 40 7 Q72 8 70 38 Q58 20 46 24 Q35 12 23 25 Q15 22 10 38 Z" fill="#2D201A"/>
-                        <!-- Big Twinkling Eyes -->
-                        <ellipse cx="27" cy="43" rx="4.6" ry="5.6" fill="#1E1B18"/>
-                        <ellipse cx="53" cy="43" rx="4.6" ry="5.6" fill="#1E1B18"/>
-                        <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="28.5" cy="45" r="1" fill="#FFFFFF"/>
-                        <circle cx="54.5" cy="45" r="1" fill="#FFFFFF"/>
-                        <!-- Blush & Big Joyful Smile -->
-                        <ellipse cx="17" cy="52" rx="6.2" ry="3.6" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6.2" ry="3.6" fill="url(#cheekBlush)"/>
-                        <path d="M34 51 Q40 60 46 51 Z" fill="#F43F5E"/>
-                    </g>
-                </g>
-
-                <!-- Person 6: Cute Girl in Pastel Purple Dress with Bear Ear Beret (scale 0.85 -> Y: 54.0) -->
-                <g transform="translate(481, 54.0) scale(0.85)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 1.25s;">
-                        <!-- Long Wavy Hair Back -->
-                        <path d="M8 42 Q3 90 14 100 L66 100 Q77 90 72 42 Z" fill="#4A2E21"/>
-                        <!-- Legs & Purple Shoes -->
-                        <path d="M30 124 L29 151 M50 124 L51 151" stroke="#FFE4CE" stroke-width="9.5" stroke-linecap="round"/>
-                        <path d="M25 140 H33 M47 140 H55" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
-                        <ellipse cx="28" cy="154" rx="8" ry="5" fill="#8B5CF6"/>
-                        <ellipse cx="52" cy="154" rx="8" ry="5" fill="#8B5CF6"/>
-                        <!-- Lavender Dress with Ribbon -->
-                        <path d="M22 78 Q40 72 58 78 L68 126 Q40 134 12 126 Z" fill="#A78BFA"/>
-                        <path d="M12 122 Q26 129 40 122 Q54 129 68 122" stroke="#EDE9FE" stroke-width="3" fill="none" stroke-linecap="round"/>
-                        <path d="M35 81 L40 85 L45 81 L45 88 L40 85 L35 88 Z" fill="#F472B6"/>
-                        <circle cx="40" cy="84.5" r="2.5" fill="#FBCFE8"/>
-                        <!-- Arms -->
-                        <path d="M21 84 Q9 96 18 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
-                        <path d="M59 84 Q71 96 62 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
-                        <!-- Front Bangs & Cute Bear Beret -->
-                        <path d="M10 38 Q10 8 40 8 Q70 8 70 38 Q58 24 49 28 Q40 18 31 28 Q22 24 10 38 Z" fill="#4A2E21"/>
-                        <circle cx="20" cy="10" r="6.5" fill="#C084FC"/>
-                        <circle cx="60" cy="10" r="6.5" fill="#C084FC"/>
-                        <ellipse cx="40" cy="12" rx="26" ry="9" fill="#C084FC"/>
-                        <!-- Big Sparkling Eyes -->
-                        <ellipse cx="27" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
-                        <ellipse cx="53" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
-                        <path d="M21 38 L18 35 M59 38 L62 35" stroke="#291D18" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="28.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
-                        <circle cx="54.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
-                        <!-- Blush & Cute Cat Smile -->
-                        <ellipse cx="17" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
-                        <path d="M34 53 Q37 57 40 53 Q43 57 46 53" stroke="#9F3A38" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-                    </g>
-                </g>
-
-                <!-- Person 7: Nature Lover Guy in Mint Hoodie with Cute Panda Shoulder Plush (scale 0.90 -> Y: 46.0) -->
-                <g transform="translate(574, 46.0) scale(0.90)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 1.5s;">
-                        <!-- Legs & Sneakers -->
-                        <path d="M29 124 L28 151 M51 124 L52 151" stroke="#334155" stroke-width="11" stroke-linecap="round"/>
-                        <rect x="19" y="149" width="16" height="10" rx="5" fill="#10B981"/>
-                        <rect x="45" y="149" width="16" height="10" rx="5" fill="#10B981"/>
-                        <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Mint Green Jacket & Crossbody Bag -->
-                        <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#10B981"/>
-                        <path d="M24 77 L56 118" stroke="#FEF3C7" stroke-width="4.5" stroke-linecap="round"/>
-                        <!-- Cute Mini Panda Pouch -->
-                        <circle cx="52" cy="113" r="8" fill="#FFFFFF" stroke="#1E293B" stroke-width="1.5"/>
-                        <circle cx="46" cy="107" r="3" fill="#1E293B"/><circle cx="58" cy="107" r="3" fill="#1E293B"/>
-                        <circle cx="49.5" cy="112" r="1.8" fill="#1E293B"/><circle cx="54.5" cy="112" r="1.8" fill="#1E293B"/>
-                        <!-- Arms -->
-                        <path d="M19 84 Q8 98 16 112" stroke="#10B981" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="17" cy="113" r="5" fill="#FFE0C8"/>
-                        <path d="M61 84 Q72 98 64 112" stroke="#10B981" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="63" cy="113" r="5" fill="#FFE0C8"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
-                        <!-- Hair -->
-                        <path d="M10 38 Q9 8 40 8 Q71 8 70 38 Q56 21 43 24 Q28 14 10 38 Z" fill="#26201B"/>
-                        <!-- Happy Eyes -->
-                        <ellipse cx="27" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
-                        <ellipse cx="53" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
-                        <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <circle cx="28.5" cy="45" r="1" fill="#FFFFFF"/>
-                        <circle cx="54.5" cy="45" r="1" fill="#FFFFFF"/>
-                        <!-- Blush & Smile -->
-                        <ellipse cx="17" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <path d="M34 53 Q40 59 46 53" stroke="#9F3A38" stroke-width="2.3" fill="none" stroke-linecap="round"/>
-                    </g>
-                </g>
-
-                <!-- Person 8: Sporty Guy in Blue Sweater with Headphones around Neck (scale 0.92 -> Y: 42.8) -->
-                <g transform="translate(667, 42.8) scale(0.92)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 1.75s;">
-                        <!-- Legs & Sneakers -->
-                        <path d="M29 124 L28 151 M51 124 L52 151" stroke="#1E293B" stroke-width="11" stroke-linecap="round"/>
-                        <rect x="19" y="149" width="16" height="10" rx="5" fill="#6366F1"/>
-                        <rect x="45" y="149" width="16" height="10" rx="5" fill="#6366F1"/>
-                        <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Royal Blue Sweater -->
-                        <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#6366F1"/>
-                        <path d="M24 96 H56" stroke="#A5B4FC" stroke-width="4" stroke-linecap="round"/>
-                        <!-- Cute Headphones around neck -->
-                        <ellipse cx="29" cy="78" rx="6" ry="4.5" fill="#F43F5E" stroke="#FFFFFF" stroke-width="1.5"/>
-                        <ellipse cx="51" cy="78" rx="6" ry="4.5" fill="#F43F5E" stroke="#FFFFFF" stroke-width="1.5"/>
-                        <!-- Arms -->
-                        <path d="M19 84 Q8 98 16 112" stroke="#6366F1" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="17" cy="113" r="5" fill="#FFE0C8"/>
-                        <path d="M61 84 Q74 70 69 54" stroke="#6366F1" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="69" cy="52" r="5" fill="#FFE0C8"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE0C8"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE0C8"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE0C8"/>
-                        <!-- Hair -->
-                        <path d="M10 38 Q9 8 40 8 Q71 8 70 38 Q58 21 44 23 Q28 14 10 38 Z" fill="#3A281E"/>
-                        <!-- Wink & Sparkle Eye -->
-                        <ellipse cx="27" cy="43" rx="4.5" ry="5.5" fill="#1E1B18"/>
-                        <circle cx="25.5" cy="40.5" r="2" fill="#FFFFFF"/>
-                        <circle cx="28.5" cy="45" r="1" fill="#FFFFFF"/>
-                        <path d="M47 43 Q53 36 59 43" stroke="#1E1B18" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-                        <!-- Blush & Happy Grin -->
-                        <ellipse cx="17" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6" ry="3.5" fill="url(#cheekBlush)"/>
-                        <path d="M34 52 Q40 59 46 52" stroke="#9F3A38" stroke-width="2.3" fill="none" stroke-linecap="round"/>
-                    </g>
-                </g>
-
-                <!-- Person 9: Sweet Girl in Rose Pink Outfit with Flower Hairclip (scale 0.92 -> Y: 42.8) -->
-                <g transform="translate(760, 42.8) scale(0.92)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 2.0s;">
-                        <!-- Long Hair Back -->
-                        <path d="M8 42 Q3 90 14 100 L66 100 Q77 90 72 42 Z" fill="#523225"/>
-                        <!-- Legs & Pink Shoes -->
-                        <path d="M30 124 L29 151 M50 124 L51 151" stroke="#FFE4CE" stroke-width="9.5" stroke-linecap="round"/>
-                        <path d="M25 140 H33 M47 140 H55" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
-                        <ellipse cx="28" cy="154" rx="8" ry="5" fill="#F43F5E"/>
-                        <ellipse cx="52" cy="154" rx="8" ry="5" fill="#F43F5E"/>
-                        <!-- Rose Pink Dress with Heart Apron Detail -->
-                        <path d="M22 78 Q40 72 58 78 L68 126 Q40 134 12 126 Z" fill="#FB7185"/>
-                        <use href="#mini-heart" x="40" y="94" transform="scale(1.2) translate(-7, -14)"/>
-                        <path d="M12 122 Q26 129 40 122 Q54 129 68 122" stroke="#FFE4E6" stroke-width="3" fill="none" stroke-linecap="round"/>
-                        <!-- Arms -->
-                        <path d="M21 84 Q9 96 18 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
-                        <path d="M59 84 Q71 96 62 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
-                        <!-- Hair & Kunming Camellia Flower Hairpin -->
-                        <path d="M10 38 Q10 8 40 8 Q70 8 70 38 Q56 21 40 27 Q24 21 10 38 Z" fill="#523225"/>
-                        <g transform="translate(60, 22)">
-                            <circle cx="0" cy="-4" r="3.5" fill="#FDE047"/>
-                            <circle cx="4" cy="0" r="3.5" fill="#FDE047"/>
-                            <circle cx="0" cy="4" r="3.5" fill="#FDE047"/>
-                            <circle cx="-4" cy="0" r="3.5" fill="#FDE047"/>
-                            <circle cx="0" cy="0" r="2.5" fill="#F97316"/>
-                        </g>
-                        <!-- Big Sparkling Eyes -->
-                        <ellipse cx="27" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
-                        <ellipse cx="53" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
-                        <path d="M21 38 L18 35 M59 38 L62 35" stroke="#291D18" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="28.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
-                        <circle cx="54.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
-                        <!-- Blush & Sweet Smile -->
-                        <ellipse cx="17" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
-                        <path d="M34 53 Q40 59 46 53" stroke="#9F3A38" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-                    </g>
-                </g>
-
-                <!-- Person 10: Cute Girl with Double Space Buns & Peach Pink Outfit (scale 0.84 -> Y: 55.6) -->
-                <g transform="translate(853, 55.6) scale(0.84)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 2.25s;">
-                        <!-- Long Hair Back -->
-                        <path d="M9 42 Q4 88 15 98 L65 98 Q76 88 71 42 Z" fill="#3E241E"/>
-                        <!-- Legs & Cute Shoes -->
-                        <path d="M30 124 L29 151 M50 124 L51 151" stroke="#FFE4CE" stroke-width="9.5" stroke-linecap="round"/>
-                        <path d="M25 140 H33 M47 140 H55" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
-                        <ellipse cx="28" cy="154" rx="8" ry="5" fill="#EC4899"/>
-                        <ellipse cx="52" cy="154" rx="8" ry="5" fill="#EC4899"/>
-                        <!-- Chinese-style Qipao / Cute Pastel Pink Top & Skirt -->
-                        <path d="M22 78 Q40 72 58 78 L68 126 Q40 134 12 126 Z" fill="#F472B6"/>
-                        <path d="M30 78 Q42 86 52 94" stroke="#FDE047" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                        <circle cx="36" cy="83" r="2.2" fill="#FDE047"/><circle cx="45" cy="90" r="2.2" fill="#FDE047"/>
-                        <!-- Arms -->
-                        <path d="M21 84 Q9 96 18 110" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
-                        <path d="M59 84 Q73 70 67 54" stroke="#FFE4CE" stroke-width="9" stroke-linecap="round" fill="none"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
-                        <!-- Double Odango / Pucca Space Buns with Ribbons -->
-                        <circle cx="15" cy="12" r="10" fill="#3E241E"/>
-                        <circle cx="65" cy="12" r="10" fill="#3E241E"/>
-                        <path d="M8 19 Q15 24 22 19" stroke="#F43F5E" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-                        <path d="M58 19 Q65 24 72 19" stroke="#F43F5E" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-                        <path d="M10 38 Q10 8 40 8 Q70 8 70 38 Q56 21 40 27 Q24 21 10 38 Z" fill="#3E241E"/>
-                        <!-- Big Sparkling Eyes -->
-                        <ellipse cx="27" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
-                        <ellipse cx="53" cy="43" rx="4.6" ry="5.8" fill="#291D18"/>
-                        <path d="M21 38 L18 35 M59 38 L62 35" stroke="#291D18" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="25.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="51.5" cy="40.5" r="2.1" fill="#FFFFFF"/>
-                        <circle cx="28.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
-                        <circle cx="54.5" cy="45.5" r="1.1" fill="#FFFFFF"/>
-                        <!-- Blush & Happy Smile -->
-                        <ellipse cx="17" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
-                        <ellipse cx="63" cy="52" rx="6.5" ry="3.8" fill="url(#cheekBlush)"/>
-                        <path d="M35 52 Q40 60 45 52 Z" fill="#F43F5E"/>
-                    </g>
-                </g>
-
-                <!-- Person 11: Little Kid in Yellow Shirt & Denim Overalls + Propeller Cap (scale 0.74 -> Y: 71.6) -->
-                <g transform="translate(944, 71.6) scale(0.74)" class="chibi-person">
-                    <ellipse cx="40" cy="160" rx="26" ry="5.5" fill="#07111F" opacity=".32"/>
-                    <g class="chibi-bounce" style="animation-delay: 2.5s;">
-                        <!-- Legs & Little Sneakers -->
-                        <path d="M29 124 L28 151 M51 124 L52 151" stroke="#3B82F6" stroke-width="11" stroke-linecap="round"/>
-                        <rect x="19" y="149" width="16" height="10" rx="5" fill="#EF4444"/>
-                        <rect x="45" y="149" width="16" height="10" rx="5" fill="#EF4444"/>
-                        <path d="M19 156 H35 M45 156 H61" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Yellow Shirt & Cute Blue Overalls -->
-                        <path d="M19 78 Q40 70 61 78 L65 124 Q40 131 15 124 Z" fill="#FACC15"/>
-                        <path d="M24 90 H56 L60 125 Q40 131 20 125 Z" fill="#3B82F6"/>
-                        <line x1="28" y1="76" x2="28" y2="94" stroke="#3B82F6" stroke-width="5" stroke-linecap="round"/>
-                        <line x1="52" y1="76" x2="52" y2="94" stroke="#3B82F6" stroke-width="5" stroke-linecap="round"/>
-                        <circle cx="28" cy="92" r="2.5" fill="#FDE047"/>
-                        <circle cx="52" cy="92" r="2.5" fill="#FDE047"/>
-                        <!-- Raised Cheering Arms -->
-                        <path d="M19 84 Q4 70 10 52" stroke="#FACC15" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="10" cy="50" r="5.5" fill="#FFE4CE"/>
-                        <path d="M61 84 Q76 70 70 52" stroke="#FACC15" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <circle cx="70" cy="50" r="5.5" fill="#FFE4CE"/>
-                        <!-- Head -->
-                        <circle cx="9" cy="44" r="6" fill="#FFE4CE"/>
-                        <circle cx="71" cy="44" r="6" fill="#FFE4CE"/>
-                        <rect x="10" y="12" width="60" height="58" rx="28" fill="#FFE4CE"/>
-                        <!-- Hair & Cute Cap -->
-                        <path d="M12 36 Q12 10 40 10 Q68 10 68 36 Q54 22 40 25 Q26 22 12 36 Z" fill="#6B4226"/>
-                        <path d="M18 20 Q40 2 62 20 Z" fill="#38BDF8"/>
-                        <path d="M15 20 Q40 16 68 22" stroke="#F43F5E" stroke-width="4" fill="none" stroke-linecap="round"/>
-                        <circle cx="40" cy="9" r="3" fill="#FDE047"/>
-                        <!-- Huge Adorable Kid Eyes -->
-                        <ellipse cx="27" cy="43" rx="5" ry="6" fill="#1E1B18"/>
-                        <ellipse cx="53" cy="43" rx="5" ry="6" fill="#1E1B18"/>
-                        <circle cx="25" cy="40" r="2.3" fill="#FFFFFF"/>
-                        <circle cx="51" cy="40" r="2.3" fill="#FFFFFF"/>
-                        <circle cx="29" cy="45.5" r="1.2" fill="#FFFFFF"/>
-                        <circle cx="55" cy="45.5" r="1.2" fill="#FFFFFF"/>
-                        <!-- Rosy Cheeks & Big Happy Smile -->
-                        <ellipse cx="16" cy="52" rx="7" ry="4" fill="url(#cheekBlush)"/>
-                        <ellipse cx="64" cy="52" rx="7" ry="4" fill="url(#cheekBlush)"/>
-                        <path d="M33 51 Q40 62 47 51 Z" fill="#F43F5E"/>
-                    </g>
-                </g>
-            </svg>
-            <!-- Nicknames Under Each Character (Click to edit) -->
-            <div class="nicknames-row" id="nicknames-row" aria-label="ชื่อเล่นสมาชิกทั้ง 11 คน (คลิกเพื่อแก้ไขชื่อ)">
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="0" title="คลิกเพื่อแก้ไขชื่อเล่น">แป๊บ</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="1" title="คลิกเพื่อแก้ไขชื่อเล่น">หลี</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="2" title="คลิกเพื่อแก้ไขชื่อเล่น">เจ็กตู่</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="3" title="คลิกเพื่อแก้ไขชื่อเล่น">นัท</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="4" title="คลิกเพื่อแก้ไขชื่อเล่น">บอย</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="5" title="คลิกเพื่อแก้ไขชื่อเล่น">ปู</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="6" title="คลิกเพื่อแก้ไขชื่อเล่น">คอม</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="7" title="คลิกเพื่อแก้ไขชื่อเล่น">บอล</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="8" title="คลิกเพื่อแก้ไขชื่อเล่น">นก</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="9" title="คลิกเพื่อแก้ไขชื่อเล่น">ใยแก้ว</div>
-                <div class="nickname-pill" contenteditable="true" spellcheck="false" data-index="10" title="คลิกเพื่อแก้ไขชื่อเล่น">บอส</div>
-            </div>
-            <p class="group-caption">11 เซียนสำราญ เบิกฟ้าตะลุยแดนมังกร 2026</p>
+      <!-- Timer Grid -->
+      <div class="timer-grid" id="timer-grid">
+        <div class="timer-box">
+          <div class="timer-number" id="days">00</div>
+          <div class="timer-label">วัน</div>
         </div>
-
-        <!-- Timer Display Grid -->
-        <div class="timer-grid" id="timer-grid">
-            <div class="timer-box">
-                <div class="timer-number" id="days">00</div>
-                <div class="timer-label">วัน</div>
-            </div>
-            <div class="timer-box">
-                <div class="timer-number" id="hours">00</div>
-                <div class="timer-label">ชั่วโมง</div>
-            </div>
-            <div class="timer-box">
-                <div class="timer-number" id="minutes">00</div>
-                <div class="timer-label">นาที</div>
-            </div>
-            <div class="timer-box">
-                <div class="timer-number" id="seconds">00</div>
-                <div class="timer-label">วินาที</div>
-            </div>
+        <div class="timer-box">
+          <div class="timer-number" id="hours">00</div>
+          <div class="timer-label">ชั่วโมง</div>
         </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-card">
-            <div class="progress-header">
-                <span>ความคืบหน้า</span>
-                <span id="progress-percent" style="font-weight: 600; color: #38bdf8;">0.0%</span>
-            </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progress-fill"></div>
-            </div>
-            <div class="progress-footer">
-                วันซื้อตั๋ว 14 ส.ค. 2026 ➔ วันเดินทาง 26 ธ.ค. 2026
-            </div>
+        <div class="timer-box">
+          <div class="timer-number" id="minutes">00</div>
+          <div class="timer-label">นาที</div>
         </div>
+        <div class="timer-box">
+          <div class="timer-number" id="seconds">00</div>
+          <div class="timer-label">วินาที</div>
+        </div>
+      </div>
 
+      <!-- Progress Bar -->
+      <div class="progress-card">
+        <div class="progress-header">
+          <span>ความคืบหน้า</span>
+          <span id="progress-percent" style="font-weight: 600; color: #38bdf8;">0.0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-footer">
+          วันซื้อตั๋ว 14 ส.ค. 2026 ➔ วันเดินทาง 26 ธ.ค. 2026
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- JavaScript Logic -->
-    <script>
-        // Target Date: 26 Dec 2026
-        const targetDate = new Date('2026-12-26T07:30:00').getTime();
-        
-        // Start Baseline: 18 Aug 2026
-        const startDate = new Date('2026-08-18T00:00:00').getTime();
-        const totalDuration = targetDate - startDate;
 
-        // Fireworks System (Activates automatically when countdown completes)
-        const canvas = document.getElementById('fireworks-canvas');
-        const ctx = canvas.getContext('2d');
-        let fireworksActive = false;
-        let rockets = [];
-        let particles = [];
-        let lastLaunchTime = 0;
+  <!-- ===============================================================
+       SPA VIEW 2: INFOGRAPHIC ITINERARY PAGE
+       =============================================================== -->
+  <div id="view-infographic" class="spa-page hidden">
+    <div class="info-container">
+      
+      <!-- Back to Countdown view button -->
+      <div class="back-btn-container">
+        <button type="button" class="back-btn" onclick="navigateTo('countdown')">
+          <i class="fa-solid fa-arrow-left"></i> ย้อนกลับไปหน้าเวลานับถอยหลัง (Countdown)
+        </button>
+      </div>
 
-        const fireworkColors = [
-            '#38bdf8', '#f472b6', '#facc15', '#a78bfa',
-            '#4ade80', '#fb7185', '#fb923c', '#ffffff'
-        ];
+      <!-- Hero Banner -->
+      <header class="hero">
+        <div class="hero-top">
+          <a class="source-pill" href="https://wanderlog.com/journal/vamxdtvtjesnyi/trip-to-haikou-and-kunming/shared" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            Wanderlog: trip-to-haikou-and-kunming
+          </a>
+          <span class="sample-badge" id="dataModeBadge">แผนการเดินทางจริง (9 วัน)</span>
+        </div>
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        <h1 style="font-size: clamp(24px, 4vw, 34px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; margin: 0 0 8px; color: #ffffff;">Trip to Haikou &amp; Kunming</h1>
+        <p>Dynamic Infographic สรุปเส้นทางและไฮไลท์สำคัญระหว่างเมืองชายฝั่งทะเลไห่หนาน <strong>ไหโข่ว (Haikou)</strong> และนครแห่งฤดูใบไม้ผลิ <strong>คุนหมิง (Kunming)</strong> มณฑลยูนนาน</p>
+
+        <div class="route-visual">
+          <div class="route-node">
+            <div class="node-badge haikou">HK</div>
+            <div>
+              <div class="node-title">Haikou (ไหโข่ว)</div>
+              <div class="node-sub">Hainan Province • เมืองท่า &amp; สถาปัตยกรรมฉีโหลว</div>
+            </div>
+          </div>
+
+          <div class="route-connector">
+            <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
+              <path d="M4 12H72" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>
+              <path d="M66 6L74 12L66 18" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>China Route (UTC+8)</span>
+          </div>
+
+          <div class="route-node right">
+            <div>
+              <div class="node-title">Kunming (คุนหมิง)</div>
+              <div class="node-sub">Yunnan Province • วัดโบราณ &amp; ธรรมชาติยูนนาน</div>
+            </div>
+            <div class="node-badge kunming">KM</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-label">จำนวนวันเดินทาง</div>
+          <div class="stat-val">9 วัน</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">มณฑลที่ไปเยือน</div>
+          <div class="stat-val">2 มณฑล</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">จุดแวะเช็คอินรวม</div>
+          <div class="stat-val">28 สถานที่</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">ลิงก์แผนที่ Amap</div>
+          <div class="stat-val">15 จุด 🗺️</div>
+        </div>
+      </div>
+
+      <!-- Section 1: Wanderlog Verified Highlights Comparison -->
+      <section class="section-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">1. ไฮไลท์สถานที่สำคัญแยกตามเมือง (Wanderlog Guide Data)</h2>
+            <p class="section-sub">เปรียบเทียบจุดท่องเที่ยวและวัฒนธรรมสำคัญของทั้ง 2 เมืองจากฐานข้อมูล Wanderlog</p>
+          </div>
+          <div class="filter-bar" role="tablist" aria-label="ตัวกรองเมือง">
+            <button type="button" class="tab-btn active" data-city="all">ทั้ง 2 เมือง</button>
+            <button type="button" class="tab-btn" data-city="haikou">เฉพาะ Haikou (ไหโข่ว)</button>
+            <button type="button" class="tab-btn" data-city="kunming">เฉพาะ Kunming (คุนหมิง)</button>
+          </div>
+        </div>
+
+        <div class="city-grid" id="cityGrid">
+          <!-- Haikou Column -->
+          <div class="city-panel haikou-theme" data-city-panel="haikou">
+            <div class="city-panel-head">
+              <div>
+                <span class="city-tag">Hainan • Port City</span>
+                <h3>Haikou (ไหโข่ว)</h3>
+              </div>
+            </div>
+            <p class="city-desc">เมืองหลวงของมณฑลไห่หนานริมชายฝั่งทางเหนือ โดดเด่นด้วยย่านเมืองเก่าที่ผสมผสานสถาปัตยกรรมจีนและยุโรปโคโลเนียล</p>
+            <div class="spot-list">
+              <div class="spot-item">
+                <div class="spot-info">
+                  <h4>Haikou Old Town Quarter (ย่านเมืองเก่าฉีโหลว)</h4>
+                  <p>สถาปัตยกรรมผสมผสานจีนและยุโรปโคโลเนียลอันเป็นเอกลักษณ์ของเมืองท่าไหโข่ว</p>
+                </div>
+                <span class="spot-cat">Architecture</span>
+              </div>
+              <div class="spot-item">
+                <div class="spot-info">
+                  <h4>Qilou Snack Street (ถนนคนเดินอาหารฉีโหลว)</h4>
+                  <p>ศูนย์รวมสตรีทฟู้ดและอาหารท้องถิ่นขึ้นชื่อของเกาะไห่หนาน</p>
+                </div>
+                <span class="spot-cat">Local Food</span>
+              </div>
+              <div class="spot-item">
+                <div class="spot-info">
+                  <h4>Hainan Provincial Museum (พิพิธภัณฑ์มณฑลไห่หนาน)</h4>
+                  <p>จัดแสดงประวัติศาสตร์และวัฒนธรรมกลุ่มชาติพันธุ์บนเกาะไห่หนาน</p>
+                </div>
+                <span class="spot-cat">Museum</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kunming Column -->
+          <div class="city-panel kunming-theme" data-city-panel="kunming">
+            <div class="city-panel-head">
+              <div>
+                <span class="city-tag">Yunnan • Cultural Hub</span>
+                <h3>Kunming (คุนหมิง)</h3>
+              </div>
+            </div>
+            <p class="city-desc">ศูนย์กลางการท่องเที่ยวของยูนนาน โดดเด่นด้วยวัดพุทธและเต๋าเก่าแก่ สวนพฤกษศาสตร์ขนาดใหญ่ และอาหารยูนนาน (ขนมจีนข้ามสะพานและเห็ด)</p>
+            <div class="spot-list">
+              <div class="spot-item">
+                <div class="spot-info">
+                  <h4>Yuantong Temple (วัดหยวนทง)</h4>
+                  <p>วัดพุทธโบราณตั้งแต่ศตวรรษที่ 8 อายุกว่า 1,200 ปี เชิงเขาหยวนทง</p>
+                </div>
+                <span class="spot-cat">Historic Temple</span>
+              </div>
+              <div class="spot-item">
+                <div class="spot-info">
+                  <h4>Golden Temple Park (ตำหนักทองจินเตี้ยน)</h4>
+                  <p>วัดเต๋าสัมฤทธิ์ยุคศตวรรษที่ 17 บนเนินเขาหมิงเฟิ่ง ใหญ่ที่สุดในจีน (เข้าชมฟรี)</p>
+                </div>
+                <span class="spot-cat">Taoist Site</span>
+              </div>
+              <div class="spot-item">
+                <div class="spot-info">
+                  <h4>World Horti-Expo Garden (สวนโลกคุนหมิง)</h4>
+                  <p>สวนพฤกษศาสตร์ขนาด 220 เฮกตาร์ พื้นที่สีเขียวกว่า 80% พร้อม 5 อาคารนิทรรศการ</p>
+                </div>
+                <span class="spot-cat">Nature &amp; Park</span>
+              </div>
+              <div class="spot-item">
+                <div class="spot-info">
+                  <h4>Yunnan Minority Village &amp; Guandu Ancient Town</h4>
+                  <p>หมู่บ้านวัฒนธรรมชนเผ่ายูนนาน (ค่าเข้า 90¥ / รวมโชว์ 190¥) และเมืองโบราณกวนตู้</p>
+                </div>
+                <span class="spot-cat">Culture</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Interactive Day-by-Day Timeline -->
+      <section class="section-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">2. Interactive Timeline รายวัน (Day-by-Day Flow)</h2>
+            <p class="section-sub" id="timelineSubtitle">แผนการเดินทางจริงของคุณที่อัปเดตแล้ว (กดสลับวันเพื่อดูตารางเวลาและแผนที่)</p>
+          </div>
+          <button type="button" class="btn btn-secondary" id="toggleImportBtn" style="font-size: 12.5px;">
+            📝 แก้ไข/วางข้อความใหม่
+          </button>
+        </div>
+
+        <!-- Paste / Sync Custom Wanderlog Drawer -->
+        <div class="import-box hidden" id="importArea">
+          <strong>แก้ไขหรือนำเข้าแผนการเดินทางใหม่:</strong>
+          <p style="margin: 4px 0 12px; font-size: 13px; color: var(--muted);">
+            คุณสามารถคัดลอกตารางข้อความจาก Wanderlog มาวางทับในช่องด้านล่างนี้ได้ตลอดเวลาเพื่อสร้าง Timeline ใหม่ครับ
+          </p>
+          <textarea id="rawItineraryInput" class="import-textarea" placeholder="Day 1 - Haikou
+09:00 Haikou Old Town Quarter
+12:30 Qilou Snack Street"></textarea>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" id="applyCustomBtn">สร้างแผนภาพจากข้อความใหม่</button>
+            <button type="button" class="btn btn-secondary" id="cancelImportBtn">ยกเลิก</button>
+          </div>
+        </div>
+
+        <!-- Day Selector Tabs -->
+        <div class="day-tabs" id="dayTabs" role="tablist" aria-label="เลือกวันเดินทาง"></div>
+
+        <!-- Day Stops Timeline -->
+        <div class="timeline-list" id="timelineList"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // Target Date: 26 Dec 2026
+    const targetDate = new Date('2026-12-26T07:30:00').getTime();
+    
+    // Start Baseline: 18 Aug 2026
+    const startDate = new Date('2026-08-18T00:00:00').getTime();
+    const totalDuration = targetDate - startDate;
+
+    // SPA Navigation Logic
+    function navigateTo(viewId) {
+      if (viewId === 'countdown') {
+        document.body.className = 'countdown-mode';
+        document.getElementById('view-countdown').classList.remove('hidden');
+        document.getElementById('view-infographic').classList.add('hidden');
+      } else {
+        document.body.className = 'infographic-mode';
+        document.getElementById('view-countdown').classList.add('hidden');
+        document.getElementById('view-infographic').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Fireworks System (Activates automatically when countdown completes)
+    const canvas = document.getElementById('fireworks-canvas');
+    const ctx = canvas.getContext('2d');
+    let fireworksActive = false;
+    let rockets = [];
+    let particles = [];
+    let lastLaunchTime = 0;
+    const fireworkColors = [
+      '#38bdf8', '#f472b6', '#facc15', '#a78bfa',
+      '#4ade80', '#fb7185', '#fb923c', '#ffffff'
+    ];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class FireworkRocket {
+      constructor(startX, targetX, targetY, color) {
+        this.x = startX;
+        this.y = canvas.height;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.color = color;
+        const angle = Math.atan2(targetY - this.y, targetX - this.x);
+        const speed = 10 + Math.random() * 4;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.trail = [];
+        this.exploded = false;
+      }
+      update() {
+        this.trail.push({ x: this.x, y: this.y });
+        if (this.trail.length > 8) this.trail.shift();
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.06;
+        if (this.y <= this.targetY || this.vy >= 0) {
+          this.exploded = true;
+          createExplosion(this.x, this.y, this.color);
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class FireworkRocket {
-            constructor(startX, targetX, targetY, color) {
-                this.x = startX;
-                this.y = canvas.height;
-                this.targetX = targetX;
-                this.targetY = targetY;
-                this.color = color;
-                const angle = Math.atan2(targetY - this.y, targetX - this.x);
-                const speed = 10 + Math.random() * 4;
-                this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed;
-                this.trail = [];
-                this.exploded = false;
-            }
-
-            update() {
-                this.trail.push({ x: this.x, y: this.y });
-                if (this.trail.length > 8) this.trail.shift();
-
-                this.x += this.vx;
-                this.y += this.vy;
-                this.vy += 0.06;
-
-                if (this.y <= this.targetY || this.vy >= 0) {
-                    this.exploded = true;
-                    createExplosion(this.x, this.y, this.color);
-                }
-            }
-
-            draw() {
-                ctx.save();
-                ctx.beginPath();
-                if (this.trail.length > 1) {
-                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
-                    for (let i = 1; i < this.trail.length; i++) {
-                        ctx.lineTo(this.trail[i].x, this.trail[i].y);
-                    }
-                }
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = 2.5;
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffffff';
-                ctx.fill();
-                ctx.restore();
-            }
+      }
+      draw() {
+        ctx.save();
+        ctx.beginPath();
+        if (this.trail.length > 1) {
+          ctx.moveTo(this.trail[0].x, this.trail[0].y);
+          for (let i = 1; i < this.trail.length; i++) {
+            ctx.lineTo(this.trail[i].x, this.trail[i].y);
+          }
         }
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
 
-        class FireworkParticle {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                const angle = Math.random() * Math.PI * 2;
-                const speed = 1.5 + Math.random() * 6.5;
-                this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed;
-                this.alpha = 1;
-                this.decay = 0.012 + Math.random() * 0.014;
-                this.gravity = 0.08;
-                this.friction = 0.97;
-                this.size = 2 + Math.random() * 2.2;
-            }
+    class FireworkParticle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random() * 6.5;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = 0.012 + Math.random() * 0.014;
+        this.gravity = 0.08;
+        this.friction = 0.97;
+        this.size = 2 + Math.random() * 2.2;
+      }
+      update() {
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+      draw() {
+        if (this.alpha <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
 
-            update() {
-                this.vx *= this.friction;
-                this.vy *= this.friction;
-                this.vy += this.gravity;
-                this.x += this.vx;
-                this.y += this.vy;
-                this.alpha -= this.decay;
-            }
+    function createExplosion(x, y, primaryColor) {
+      const count = 65 + Math.floor(Math.random() * 30);
+      const secondaryColor = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+      for (let i = 0; i < count; i++) {
+        const chosenColor = i % 3 === 0 ? secondaryColor : primaryColor;
+        particles.push(new FireworkParticle(x, y, chosenColor));
+      }
+    }
 
-            draw() {
-                if (this.alpha <= 0) return;
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, this.alpha);
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = this.color;
-                ctx.fill();
-                ctx.restore();
-            }
+    function launchRandomFirework() {
+      if (document.body.classList.contains('infographic-mode')) return; // skip if not active view
+      const startX = canvas.width * (0.15 + Math.random() * 0.7);
+      const targetX = startX + (Math.random() - 0.5) * 160;
+      const targetY = canvas.height * (0.12 + Math.random() * 0.42);
+      const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+      rockets.push(new FireworkRocket(startX, targetX, targetY, color));
+    }
+
+    function animateFireworks(timestamp) {
+      if (!fireworksActive && rockets.length === 0 && particles.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (fireworksActive && timestamp - lastLaunchTime > 420) {
+        launchRandomFirework();
+        if (Math.random() > 0.55) {
+          launchRandomFirework();
         }
-
-        function createExplosion(x, y, primaryColor) {
-            const count = 65 + Math.floor(Math.random() * 30);
-            const secondaryColor = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
-            for (let i = 0; i < count; i++) {
-                const chosenColor = i % 3 === 0 ? secondaryColor : primaryColor;
-                particles.push(new FireworkParticle(x, y, chosenColor));
-            }
+        lastLaunchTime = timestamp;
+      }
+      for (let i = rockets.length - 1; i >= 0; i--) {
+        rockets[i].update();
+        rockets[i].draw();
+        if (rockets[i].exploded) {
+          rockets.splice(i, 1);
         }
-
-        function launchRandomFirework() {
-            const startX = canvas.width * (0.15 + Math.random() * 0.7);
-            const targetX = startX + (Math.random() - 0.5) * 160;
-            const targetY = canvas.height * (0.12 + Math.random() * 0.42);
-            const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
-            rockets.push(new FireworkRocket(startX, targetX, targetY, color));
+      }
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        if (particles[i].alpha <= 0) {
+          particles.splice(i, 1);
         }
+      }
+      requestAnimationFrame(animateFireworks);
+    }
 
-        function animateFireworks(timestamp) {
-            if (!fireworksActive && rockets.length === 0 && particles.length === 0) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                return;
-            }
+    function startFireworksCelebration() {
+      if (fireworksActive) return;
+      fireworksActive = true;
+      document.querySelectorAll('.timer-box').forEach(box => box.classList.add('celebrating'));
+      for (let i = 0; i < 4; i++) {
+        setTimeout(launchRandomFirework, i * 180);
+      }
+      requestAnimationFrame(animateFireworks);
+    }
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function updateTimer() {
+      const now = new Date().getTime();
+      const timeDiff = targetDate - now;
+      if (timeDiff > 0) {
+        // Time calculations
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
-            if (fireworksActive && timestamp - lastLaunchTime > 420) {
-                launchRandomFirework();
-                if (Math.random() > 0.55) {
-                    launchRandomFirework();
-                }
-                lastLaunchTime = timestamp;
-            }
+        // Render Numbers
+        document.getElementById('days').innerText = String(days).padStart(2, '0');
+        document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+        document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
 
-            for (let i = rockets.length - 1; i >= 0; i--) {
-                rockets[i].update();
-                rockets[i].draw();
-                if (rockets[i].exploded) {
-                    rockets.splice(i, 1);
-                }
-            }
+        // Progress Bar calculation
+        const elapsedTime = now - startDate;
+        let percentage = (elapsedTime / totalDuration) * 100;
+        percentage = Math.max(0, Math.min(100, percentage));
+        document.getElementById('progress-fill').style.width = percentage.toFixed(1) + '%';
+        document.getElementById('progress-percent').innerText = percentage.toFixed(1) + '%';
+      } else {
+        document.getElementById('days').innerText = '00';
+        document.getElementById('hours').innerText = '00';
+        document.getElementById('minutes').innerText = '00';
+        document.getElementById('seconds').innerText = '00';
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('progress-percent').innerText = '100.0%';
 
-            for (let i = particles.length - 1; i >= 0; i--) {
-                particles[i].update();
-                particles[i].draw();
-                if (particles[i].alpha <= 0) {
-                    particles.splice(i, 1);
-                }
-            }
+        // Launch fireworks when countdown finishes
+        startFireworksCelebration();
+      }
+    }
 
-            requestAnimationFrame(animateFireworks);
-        }
+    // Run timer immediately and set interval
+    updateTimer();
+    setInterval(updateTimer, 1000);
 
-        function startFireworksCelebration() {
-            if (fireworksActive) return;
-            fireworksActive = true;
-            document.querySelectorAll('.timer-box').forEach(box => box.classList.add('celebrating'));
-            for (let i = 0; i < 4; i++) {
-                setTimeout(launchRandomFirework, i * 180);
-            }
-            requestAnimationFrame(animateFireworks);
-        }
+    // Interactive Nickname Pills & Character Hover Sync
+    const chibiPersons = document.querySelectorAll('.chibi-person');
+    const nicknamePills = document.querySelectorAll('.nickname-pill');
+    const defaultNicknames = ['แป๊บ', 'หลี', 'เจ็กตู่', 'นัท', 'บอย', 'ปู', 'คอม', 'บอล', 'นก', 'ใยแก้ว', 'บอส'];
+    const STORAGE_KEY = 'china_trip_2026_nicknames_v2';
 
-        function updateTimer() {
-            const now = new Date().getTime();
-            const timeDiff = targetDate - now;
-
-            if (timeDiff > 0) {
-                // Time calculations
-                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
-                // Render Numbers
-                document.getElementById('days').innerText = String(days).padStart(2, '0');
-                document.getElementById('hours').innerText = String(hours).padStart(2, '0');
-                document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
-                document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
-
-                // Progress Bar calculation
-                const elapsedTime = now - startDate;
-                let percentage = (elapsedTime / totalDuration) * 100;
-                percentage = Math.max(0, Math.min(100, percentage));
-
-                document.getElementById('progress-fill').style.width = percentage.toFixed(1) + '%';
-                document.getElementById('progress-percent').innerText = percentage.toFixed(1) + '%';
-            } else {
-                document.getElementById('days').innerText = '00';
-                document.getElementById('hours').innerText = '00';
-                document.getElementById('minutes').innerText = '00';
-                document.getElementById('seconds').innerText = '00';
-                document.getElementById('progress-fill').style.width = '100%';
-                document.getElementById('progress-percent').innerText = '100.0%';
-
-                // Launch fireworks when countdown finishes
-                startFireworksCelebration();
-            }
-        }
-
-        // Run timer immediately and set interval
-        updateTimer();
-        setInterval(updateTimer, 1000);
-
-        // Interactive Nickname Pills & Character Hover Sync
-        const chibiPersons = document.querySelectorAll('.chibi-person');
-        const nicknamePills = document.querySelectorAll('.nickname-pill');
-        const defaultNicknames = ['แป๊บ', 'หลี', 'เจ็กตู่', 'นัท', 'บอย', 'ปู', 'คอม', 'บอล', 'นก', 'ใยแก้ว', 'บอส'];
-        const STORAGE_KEY = 'china_trip_2026_nicknames_v2';
-
-        try {
-            const savedNames = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-            if (Array.isArray(savedNames)) {
-                nicknamePills.forEach((pill, i) => {
-                    if (savedNames[i]) pill.textContent = savedNames[i];
-                });
-            }
-        } catch (e) {}
-
-        function saveNicknames() {
-            try {
-                const names = Array.from(nicknamePills).map((p, i) => p.textContent.trim() || defaultNicknames[i]);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(names));
-            } catch (e) {}
-        }
-
-        nicknamePills.forEach((pill, index) => {
-            const person = chibiPersons[index];
-            if (person) {
-                person.addEventListener('mouseenter', () => pill.classList.add('active-hover'));
-                person.addEventListener('mouseleave', () => pill.classList.remove('active-hover'));
-                person.addEventListener('click', () => {
-                    pill.focus();
-                    const range = document.createRange();
-                    range.selectNodeContents(pill);
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                });
-            }
-            pill.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    pill.blur();
-                }
-            });
-            pill.addEventListener('blur', () => {
-                if (!pill.textContent.trim()) {
-                    pill.textContent = defaultNicknames[index];
-                }
-                saveNicknames();
-            });
+    try {
+      const savedNames = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if (Array.isArray(savedNames)) {
+        nicknamePills.forEach((pill, i) => {
+          if (savedNames[i]) pill.textContent = savedNames[i];
         });
+      }
+    } catch (e) {}
 
-        // Load real Wikimedia Commons photographs via MediaWiki API (with direct Special:FilePath fallback)
-        (function loadRealCityPhotos() {
-            const haikouImg = document.getElementById('bg-img-haikou');
-            const kunmingImg = document.getElementById('bg-img-kunming');
-            const apiBase = ['https://commons.wikimedia.org', '/w/api.php?action=query&prop=imageinfo&iiprop=url&iiurlwidth=1600&format=json&origin=*&titles='].join('');
+    function saveNicknames() {
+      try {
+        const names = Array.from(nicknamePills).map((p, i) => p.textContent.trim() || defaultNicknames[i]);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(names));
+      } catch (e) {}
+    }
 
-            async function fetchCommonsPhoto(fileTitle, imgEl) {
-                if (!imgEl) return;
-                try {
-                    const res = await fetch(apiBase + encodeURIComponent(fileTitle));
-                    const data = await res.json();
-                    const pages = (data && data.query && data.query.pages) || {};
-                    const page = Object.values(pages)[0];
-                    const url = page && page.imageinfo && page.imageinfo[0] && (page.imageinfo[0].thumburl || page.imageinfo[0].url);
-                    if (url) {
-                        imgEl.src = url;
-                        return;
-                    }
-                } catch (err) {}
-                imgEl.src = ['https://commons.wikimedia.org', '/wiki/Special:FilePath/', fileTitle.replace('File:', ''), '?width=1600'].join('');
-            }
+    nicknamePills.forEach((pill, index) => {
+      const person = chibiPersons[index];
+      if (person) {
+        person.addEventListener('mouseenter', () => pill.classList.add('active-hover'));
+        person.addEventListener('mouseleave', () => pill.classList.remove('active-hover'));
+        person.addEventListener('click', () => {
+          pill.focus();
+          const range = document.createRange();
+          range.selectNodeContents(pill);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        });
+      }
+      pill.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          pill.blur();
+        }
+      });
+      pill.addEventListener('blur', () => {
+        if (!pill.textContent.trim()) {
+          pill.textContent = defaultNicknames[index];
+        }
+        saveNicknames();
+      });
+    });
 
-            fetchCommonsPhoto('File:Haikou_Century_Bridge_from_southwest_shore_01.jpg', haikouImg);
-            fetchCommonsPhoto('File:55400-Kunming-Green-Lake-Park_(27897028023).jpg', kunmingImg);
-        })();
-    </script>
+    // Load real Wikimedia Commons photographs via MediaWiki API
+    (function loadRealCityPhotos() {
+      const haikouImg = document.getElementById('bg-img-haikou');
+      const kunmingImg = document.getElementById('bg-img-kunming');
+      const apiBase = 'https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&iiprop=url&iiurlwidth=1600&format=json&origin=*&titles=';
+
+      async function fetchCommonsPhoto(fileTitle, imgEl) {
+        if (!imgEl) return;
+        try {
+          const res = await fetch(apiBase + encodeURIComponent(fileTitle));
+          const data = await res.json();
+          const pages = (data && data.query && data.query.pages) || {};
+          const page = Object.values(pages)[0];
+          const url = page && page.imageinfo && page.imageinfo[0] && (page.imageinfo[0].thumburl || page.imageinfo[0].url);
+          if (url) {
+            imgEl.src = url;
+            return;
+          }
+        } catch (err) {}
+        imgEl.src = 'https://commons.wikimedia.org/wiki/Special:FilePath/' + fileTitle.replace('File:', '') + '?width=1600';
+      }
+
+      fetchCommonsPhoto('File:Haikou_Century_Bridge_from_southwest_shore_01.jpg', haikouImg);
+      fetchCommonsPhoto('File:55400-Kunming-Green-Lake-Park_(27897028023).jpg', kunmingImg);
+    })();
+
+
+    /* -------------------------------------------------------------
+       INFOGRAPHIC ITINERARY CONTROLS & RENDER LOGIC
+       ------------------------------------------------------------- */
+    const REAL_ITINERARY = [
+      {
+        dayLabel: "Sat 26 Dec",
+        city: "haikou",
+        cityLabel: "Haikou (ไหโข่ว)",
+        stops: [
+          {
+            time: "07:30 - 07:50",
+            title: "Hub Airport Parking",
+            notes: "ที่จอดรถสำรองสนามบินสุวรรณภูมิ บริการรถรับส่งสนามบิน (ใช้เวลาเดินทางประมาณ 31 นาที / 16 กม.)"
+          },
+          {
+            time: "08:00 AM",
+            title: "Suvarnabhumi Airport (ท่าอากาศยานสุวรรณภูมิ)",
+            notes: "เตรียมตัวเช็คอินเที่ยวบินต่างประเทศ"
+          },
+          {
+            time: "09:30 - 10:30",
+            title: "Miracle Lounge Suvarnabhumi Airport (Near Gate D5)",
+            notes: "พักผ่อนทานของว่างใน Miracle Lounge หน้าทางขึ้นเครื่อง"
+          },
+          {
+            time: "14:25 - 16:00",
+            title: "Haikou Meilan International Airport (สนามบินไหโข่ว เม่ยหลาน)",
+            notes: "เดินทางถึงสนามบินนานาชาติไหโข่ว เทอร์มินอล 2 มณฑลไห่หนาน",
+            mapUrl: "https://surl.amap.com/2o6ydgWK0va"
+          },
+          {
+            time: "Check-in Hotel",
+            title: "Aili Hotel (โรงแรมอ้ายลี่ คิวโหลว โอลด์ สตรีท)",
+            notes: "Aili Wisdom Hotel (Haikou Friendship Commercial Plaza Qilou Old Street Branch) - พักผ่อนเก็บกระเป๋า",
+            mapUrl: "https://surl.amap.com/q5w6cZQ1a2fd"
+          },
+          {
+            time: "18:00 - 18:30",
+            title: "Haikou Qilou Snack Street (ถนนของกินฉีโหลว)",
+            notes: "เดินเที่ยวชมของว่างและของกินเล่นท้องถิ่น"
+          },
+          {
+            time: "18:30 - 21:00",
+            title: "Qilou Old Street Wenchang Ji Restaurant (ร้านอาหารไก่วินเชียง ยงจี๋จี๋)",
+            notes: "Suxiaoying Wenchang Chicken Yongjiji Restaurant (Qilou Old Street Branch) - มื้อเย็นลิ้มลองเมนูไก่เวินชางขึ้นชื่อ (ค่าใช้จ่ายเฉลี่ยประมาณ ¥57/คน)",
+            mapUrl: "https://surl.amap.com/2ldmOXJQ1q7rs"
+          }
+        ]
+      },
+      {
+        dayLabel: "Sun 27 Dec",
+        city: "haikou",
+        cityLabel: "Haikou (ไหโข่ว)",
+        stops: [
+          {
+            time: "09:30 - 12:00",
+            title: "Haikou Volcanic Cluster Global Geopark (อุทยานธรณีวิทยาภูเขาไฟไหโข่ว)",
+            notes: "ศึกษาประวัติศาสตร์ทางธรณีวิทยาและธรรมชาติภูเขาไฟโบราณ (เดินทางประมาณ 20 นาที / 22 กม.)"
+          },
+          {
+            time: "14:30 - 17:30",
+            title: "Haikou International Duty-Free City (เมืองปลอดภาษีนานาชาติไหโข่ว)",
+            notes: "ช้อปปิ้งสินค้าแบรนด์เนมปลอดภาษีที่ห้างดิวตี้ฟรีที่ใหญ่ที่สุด"
+          },
+          {
+            time: "19:00 - 19:30",
+            title: "Xitian Temple & Snack Street (วัดซีเทียนและถนนของกินเล่น)",
+            notes: "กราบไหว้สิ่งศักดิ์สิทธิ์และแวะชิมสตรีทฟู้ดราคาประหยัดที่ซอยข้างวัด (ค่าใช้จ่ายประมาณ ¥27/คน)",
+            mapUrl: "https://surl.amap.com/2lwmIzkiH2KL"
+          },
+          {
+            time: "19:30 - 21:00",
+            title: "Fuyuanji Restaurant (ร้านไก่เวินชาง ฟู่หยวนจี๋)",
+            notes: "Yiqunfu Yuanji Wenchang Jidawang (Deshengsha Head Office) - อร่อยกับไก่เวินชางสูตรดั้งเดิม (เฉลี่ยประมาณ ¥65/คน)",
+            mapUrl: "https://surl.amap.com/z48KDCaJ1x5"
+          }
+        ]
+      },
+      {
+        dayLabel: "Mon 28 Dec",
+        city: "haikou",
+        cityLabel: "Haikou (ไหโข่ว)",
+        stops: [
+          {
+            time: "09:30 - 11:00",
+            title: "Yamei Traditional Hainan Rice Noodles Restaurant (ร้านขนมจีนไหหลำ ย่าเหมย)",
+            notes: "Yamei Traditional Hainan Rice Noodle Restaurant (Qilou Old Street Branch) - ชิมเส้นขนมจีนไหหลำสไตล์โบราณสุดอร่อย (เฉลี่ยเพียง ¥14/คน)",
+            mapUrl: "https://surl.amap.com/gM1OQRAj1BN"
+          },
+          {
+            time: "12:30 - 13:30",
+            title: "Hengda Beautiful Sha Parking Lot",
+            notes: "แวะจอดพักรถทำธุระเพื่อความสะดวกในการเดินทาง"
+          },
+          {
+            time: "14:30 - 15:30",
+            title: "Haikou Library (หอสมุดประชาชนไหโข่ว)",
+            notes: "แวะเยี่ยมชมสถาปัตยกรรมและแหล่งการเรียนรู้ของเมือง"
+          },
+          {
+            time: "16:00 - 17:00",
+            title: "Haikou Century Bridge (สะพานศตวรรษไหโข่ว)",
+            notes: "ชมทิวทัศน์ริมทะเลและสะพานข้ามอ่าวอันงดงามในช่วงพระอาทิตย์ตกดิน"
+          },
+          {
+            time: "18:00 - 21:00",
+            title: "Haida South Gate Night Market (ตลาดโต้รุ่งประตูใต้ ม.ไห่หนาน)",
+            notes: "海大南门小吃一条街 - เดินเลือกซื้อของกินยามค่ำคืนที่มีชื่อเสียงที่สุดในไหโข่ว (ค่าอาหารเฉลี่ย ¥45/คน)",
+            mapUrl: "https://surl.amap.com/2mlAgH8W12bIt"
+          }
+        ]
+      },
+      {
+        dayLabel: "Tue 29 Dec",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "Transit Flight",
+            title: "เดินทางข้ามมณฑลสู่ Kunming (คุนหมิง)",
+            notes: "เดินทางจากสนามบินไหโข่วบินลัดฟ้าสู่มหานครคุนหมิง ยูนนาน"
+          },
+          {
+            time: "19:30 - 21:00",
+            title: "Nanping Pedestrian Street (ถนนคนเดินหนานผิง)",
+            notes: "เดินเล่นย่านศูนย์กลางการค้ากลางเมืองคุนหมิง แหล่งช้อปปิ้งทันสมัย",
+            mapUrl: "https://surl.amap.com/3nN1ZggZS0ff"
+          },
+          {
+            time: "Dinner",
+            title: "Laodian Shanzhai Restaurant (ร้านอาหารลี่เจียง เหล่าเตี้ยนซานไจ้)",
+            notes: "Laodian Shanzhai Yunnan Nationality Characteristic Cai (Jinbi Branch) - ลิ้มลองอาหารพื้นเมืองชาติพันธุ์ยูนนานรสเลิศ (เฉลี่ย ¥62/คน)",
+            mapUrl: "https://surl.amap.com/2nmiMBIqY6AW"
+          }
+        ]
+      },
+      {
+        dayLabel: "Wed 30 Dec",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "10:00 - 12:30",
+            title: "Stone Forest Entrance (ทางเข้าป่าหินสือหลิน)",
+            notes: "เดินทางไปป่าหินมรดกโลกธรรมชาติอายุกว่า 270 ล้านปี (เดินทางประมาณ 1 ชม. 5 นาที / 87 กม.)"
+          },
+          {
+            time: "14:00 - 17:00",
+            title: "Jiuxiang Caves (ถ้ำจิ่วเซียง)",
+            notes: "九乡溶洞群 - ชมถ้ำหินงอกหินย้อยอันงดงามตระการตาและน้ำตกใต้ดินที่อลังการ"
+          },
+          {
+            time: "20:00 - 22:00",
+            title: "Kunming Old Street (ถนนคนเดินเมืองเก่าคุนหมิง)",
+            notes: "昆明老街 - สัมผัสย่านตึกโบราณอายุกกว่าร้อยปีที่ได้รับการอนุรักษ์อย่างงดงาม",
+            mapUrl: "https://surl.amap.com/2mRxOAHs1i0dT"
+          },
+          {
+            time: "Dinner",
+            title: "Qie Zi Qia Qia Restaurant (ร้านอาหารเจี่ยจื่อ เชี่ยเชี่ย)",
+            notes: "Qiezi Qiaqia Xin Yunnan Shan Yecai (Kunming Old Street Shop) - ทานอาหารป่ายูนนานรสชาติจัดจ้านร่วมสมัย (เฉลี่ย ¥54/คน)",
+            mapUrl: "https://surl.amap.com/4YMibOSpaj0"
+          }
+        ]
+      },
+      {
+        dayLabel: "Thu 31 Dec",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "10:30 - 12:30",
+            title: "Xishan Scenic Area (อุทยานเขาซีซาน/ประตูสวรรค์หลงเหมิน)",
+            notes: "ขึ้นกระเช้าลอยฟ้าชมทิวทัศน์ทะเลสาบเตียนฉือจากวิหารหินแกะสลักบนหน้าผาสูง"
+          },
+          {
+            time: "14:00 - 15:30",
+            title: "Dounan Flowers & Plants Market (ตลาดดอกไม้โต่วหนาน)",
+            notes: "แวะชมตลาดค้าส่งดอกไม้ที่ใหญ่ที่สุดในเอเชีย ตระการตาด้วยดอกไม้นานาพรรณในราคาขายส่ง"
+          },
+          {
+            time: "15:30 - 17:00",
+            title: "Laoyuhe Wetland Park (อุทยานพื้นที่ชุ่มน้ำเหล่าอวี่เหอ)",
+            notes: "เดินชมสะพานไม้ริมน้ำ ท่ามกลางแมกไม้ร่มรื่นริมทะเลสาบเตียนฉือ"
+          },
+          {
+            time: "17:00 - 19:30",
+            title: "Haiyancun (หมู่บ้านไห่เหยียน)",
+            notes: "สัมผัสวิถีชีวิตชาวประมงท้องถิ่นยูนนาน ริมทะเลสาบและรับลมชมพระอาทิตย์ตกดิน"
+          },
+          {
+            time: "Dinner",
+            title: "Grandmother Flavour Restaurant (ร้านคุณยายยูนนาน ยายไวแหลง)",
+            notes: "Grandmother Flavour Yunnan Caida Dangjia (Old Street Branch) - ชิมเมนูสูตรคุณยายสไตล์ต้นตำรับยูนนานแท้ ๆ (เฉลี่ย ¥60/คน)",
+            mapUrl: "https://surl.amap.com/1k9hv3s21rbgi"
+          }
+        ]
+      },
+      {
+        dayLabel: "Fri 01 Jan",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "09:00 - 10:00",
+            title: "Cuihu Park (สวนสาธารณะทะเลสาบเขียว)",
+            notes: "翠湖 - เดินเล่นพักผ่อนรอบทะเลสาบกลางเมืองคุนหมิง ชมฝูงนกนางนวลหัวดำที่บินอพยพมาพึ่งหนาว"
+          },
+          {
+            time: "10:30 - 11:30",
+            title: "Huang Gong Dong Jie (ถนนประวัติศาสตร์หวงกงกงเจี่ย)",
+            notes: "เดินเล่นถ่ายรูปในซอยที่มีตึกผนังสีเหลืองสไตล์คลาสสิกโดดเด่น"
+          },
+          {
+            time: "12:00 - 12:30",
+            title: "Wenlin Street (ถนนเหวินหลินเจี่ย)",
+            notes: "แวะเดินย่านถนนคาเฟ่และร้านหนังสือสุดเก๋ของคุนหมิง"
+          },
+          {
+            time: "12:30 - 14:00",
+            title: "Qiaoxiangyuan Cross-Bridge Noodles (ขนมจีนข้ามสะพานเฉียวเซียงหยวน)",
+            notes: "Jiangshi Brother Bridge Xiangyuan (Cuihu Branch) - ร้านขนมจีนข้ามสะพานแบรนด์ดังระดับร้อยปีของคุนหมิง (เฉลี่ย ¥37/คน)",
+            mapUrl: "https://surl.amap.com/2n8UxkuG114jU"
+          },
+          {
+            time: "15:00 - 16:00",
+            title: "Xun Jin Jie (ถนนสวินจินเจี่ย & ร้านกาแฟแกะ)",
+            notes: "Xiaoyang Coffee Lamb Coffee - แวะเช็คอินร้านกาแฟสไตล์มินิมอลสุดน่ารักชิว ๆ (เฉลี่ย ¥53/คน)",
+            mapUrl: "https://surl.amap.com/1z86pICJeyg"
+          },
+          {
+            time: "18:30 - 20:30",
+            title: "Shuangqiao Night Market (ตลาดโต้รุ่งซวงเฉียว)",
+            notes: "Shuangqiao Night Market Fengqing Street - ตลาดมืดคึกคักแหล่งชิมบาร์บีคิวปิ้งย่างสไตล์ยูนนาน (เฉลี่ย ¥45/คน)",
+            mapUrl: "https://surl.amap.com/2ntxSAsu1yb1D"
+          }
+        ]
+      },
+      {
+        dayLabel: "Sat 02 Jan",
+        city: "kunming",
+        cityLabel: "Kunming (คุนหมิง)",
+        stops: [
+          {
+            time: "13:30 - 17:00",
+            title: "Kunming Changshui International Airport (สนามบินคุนหมิง ฉางสุ่ย)",
+            notes: "เช็คอินเดินทางกลับด้วยเที่ยวบินข้ามมณฑลไปยังสนามบินไหโข่ว"
+          },
+          {
+            time: "19:50 - 20:30",
+            title: "Haikou Meilan International Airport (สนามบินไหโข่ว เม่ยหลาน)",
+            notes: "เดินทางถึงไหโข่วโดยสวัสดิภาพ ดินแดนตอนใต้"
+          },
+          {
+            time: "21:00 PM",
+            title: "Check-in Haikou Meilan International Airport Hotel (โรงแรมสนามบินเม่ยหลาน)",
+            notes: "เช็คอินเพื่อความสะดวกในการบินกลับกรุงเทพฯ ในเช้าวันถัดไป"
+          }
+        ]
+      },
+      {
+        dayLabel: "Sun 03 Jan",
+        city: "haikou",
+        cityLabel: "Haikou (ไหโข่ว)",
+        stops: [
+          {
+            time: "14:30 - 16:00",
+            title: "Haikou Meilan International Airport (Northeast High Class Lounge)",
+            notes: "แวะทานอาหารว่างและเครื่องดื่มที่เลานจ์ระดับพรีเมียมก่อนขึ้นเครื่องเดินทางกลับ"
+          },
+          {
+            time: "19:30 PM",
+            title: "Hub Airport Parking (เดินทางถึงสุวรรณภูมิโดยสวัสดิภาพ)",
+            notes: "รับรถยนต์กลับบ้านด้วยความปลอดภัยจบทริปความประทับใจ ไหโข่ว-คุนหมิง"
+          }
+        ]
+      }
+    ];
+
+    let currentItinerary = JSON.parse(JSON.stringify(REAL_ITINERARY));
+    let activeDayIndex = 0;
+
+    const cityFilterBtns = document.querySelectorAll('.tab-btn[data-city]');
+    const cityPanels = document.querySelectorAll('[data-city-panel]');
+    const dayTabsEl = document.getElementById('dayTabs');
+    const timelineListEl = document.getElementById('timelineList');
+    const toggleImportBtn = document.getElementById('toggleImportBtn');
+    const importArea = document.getElementById('importArea');
+    const cancelImportBtn = document.getElementById('cancelImportBtn');
+    const rawItineraryInput = document.getElementById('rawItineraryInput');
+    const applyCustomBtn = document.getElementById('applyCustomBtn');
+    const dataModeBadge = document.getElementById('dataModeBadge');
+    const timelineSubtitle = document.getElementById('timelineSubtitle');
+
+    // City Filter Interaction
+    cityFilterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const selected = btn.getAttribute('data-city');
+        cityFilterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        cityPanels.forEach(panel => {
+          const panelCity = panel.getAttribute('data-city-panel');
+          if (selected === 'all' || selected === panelCity) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        });
+      });
+    });
+
+    // Toggle Import Drawer
+    toggleImportBtn.addEventListener('click', () => {
+      importArea.classList.toggle('hidden');
+      if (!importArea.classList.contains('hidden')) {
+        rawItineraryInput.focus();
+      }
+    });
+
+    cancelImportBtn.addEventListener('click', () => {
+      importArea.classList.add('hidden');
+    });
+
+    // Render Day Tabs & Timeline
+    function renderTimeline() {
+      dayTabsEl.innerHTML = '';
+      currentItinerary.forEach((dayObj, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'day-tab' + (idx === activeDayIndex ? ' active' : '');
+        const dot = document.createElement('span');
+        dot.className = 'day-dot ' + (dayObj.city === 'haikou' ? 'haikou' : 'kunming');
+        btn.appendChild(dot);
+        btn.appendChild(document.createTextNode(dayObj.dayLabel));
+        btn.addEventListener('click', () => {
+          activeDayIndex = idx;
+          renderTimeline();
+        });
+        dayTabsEl.appendChild(btn);
+      });
+
+      timelineListEl.innerHTML = '';
+      const activeDay = currentItinerary[activeDayIndex];
+      if (!activeDay || !activeDay.stops || !activeDay.stops.length) {
+        timelineListEl.innerHTML = '<p style="color: var(--muted); font-size: 14px; padding: 20px;">ยังไม่มีรายการสถานที่สำหรับวันนี้</p>';
+        return;
+      }
+
+      activeDay.stops.forEach(stop => {
+        const card = document.createElement('div');
+        card.className = 'timeline-card ' + (activeDay.city === 'haikou' ? 'haikou' : 'kunming');
+
+        const top = document.createElement('div');
+        top.className = 'timeline-top';
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'timeline-time';
+        timeSpan.textContent = stop.time || activeDay.cityLabel;
+
+        const citySpan = document.createElement('span');
+        citySpan.style.fontSize = '12px';
+        citySpan.style.color = 'var(--muted)';
+        citySpan.textContent = activeDay.cityLabel;
+
+        top.appendChild(timeSpan);
+        top.appendChild(citySpan);
+
+        const title = document.createElement('h4');
+        title.className = 'timeline-title';
+        title.textContent = stop.title;
+
+        const notes = document.createElement('p');
+        notes.className = 'timeline-notes';
+        notes.textContent = stop.notes || '';
+
+        card.appendChild(top);
+        card.appendChild(title);
+        if (stop.notes) {
+          card.appendChild(notes);
+        }
+
+        // Add map button if mapUrl exists
+        if (stop.mapUrl) {
+          const mapLink = document.createElement('a');
+          mapLink.href = stop.mapUrl;
+          mapLink.target = "_blank";
+          mapLink.rel = "noopener";
+          mapLink.className = "map-btn";
+          mapLink.innerHTML = `
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+              <line x1="9" y1="3" x2="9" y2="18"></line>
+              <line x1="15" y1="6" x2="15" y2="21"></line>
+            </svg>
+            เปิดแผนที่ Amap 🗺️
+          `;
+          card.appendChild(mapLink);
+        }
+
+        timelineListEl.appendChild(card);
+      });
+    }
+
+    // Parse Custom Pasted Wanderlog Text
+    function parseCustomText(text) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (!lines.length) return null;
+
+      const days = [];
+      let currentDay = null;
+
+      const dayHeaderRegex = /^(?:day\s*\d+|วันที่\s*\d+|วันแรก|วันที่หนึ่ง|mon|tue|wed|thu|fri|sat|sun)/i;
+
+      lines.forEach(line => {
+        if (dayHeaderRegex.test(line) || (line.endsWith(':') && line.length < 45)) {
+          const lower = line.toLowerCase();
+          const isHaikou = lower.includes('haikou') || lower.includes('ไหโข่ว') || lower.includes('ไห่หนาน');
+          currentDay = {
+            dayLabel: line.replace(/:$/, ''),
+            city: isHaikou ? 'haikou' : 'kunming',
+            cityLabel: isHaikou ? 'Haikou (ไหโข่ว)' : 'Kunming (คุนหมิง)',
+            stops: []
+          };
+          days.push(currentDay);
+        } else {
+          if (!currentDay) {
+            const lower = line.toLowerCase();
+            const isHaikou = lower.includes('haikou') || lower.includes('ไหโข่ว');
+            currentDay = {
+              dayLabel: 'Day 1',
+              city: isHaikou ? 'haikou' : 'kunming',
+              cityLabel: isHaikou ? 'Haikou (ไหโข่ว)' : 'Kunming (คุนหมิง)',
+              stops: []
+            };
+            days.push(currentDay);
+          }
+
+          // Match optional time like "09:00" or "09:00 - 10:30"
+          const timeMatch = line.match(/^(\d{1,2}[:.]\d{2}(?:\s*-\s*\d{1,2}[:.]\d{2})?|\S+ช่วง\S*)\s+(.+)$/);
+          let timeStr = 'จุดเช็คอิน';
+          let rest = line;
+          if (timeMatch) {
+            timeStr = timeMatch[1];
+            rest = timeMatch[2];
+          }
+
+          const parts = rest.split(/\s+[-–—]\s+/);
+          const title = parts[0].trim();
+          const notes = parts.slice(1).join(' - ').trim();
+
+          currentDay.stops.push({
+            time: timeStr,
+            title: title,
+            notes: notes
+          });
+        }
+      });
+
+      return days.filter(d => d.stops.length > 0);
+    }
+
+    applyCustomBtn.addEventListener('click', () => {
+      const raw = rawItineraryInput.value.trim();
+      const parsed = parseCustomText(raw);
+      if (parsed && parsed.length > 0) {
+        currentItinerary = parsed;
+        activeDayIndex = 0;
+        dataModeBadge.textContent = 'ข้อมูลจากแผนอัปเดตใหม่เรียบร้อยแล้ว';
+        dataModeBadge.style.background = '#dcfce7';
+        dataModeBadge.style.color = '#166534';
+        dataModeBadge.style.borderColor = '#86efac';
+        timelineSubtitle.textContent = 'กำลังแสดงตารางการเดินทางจากข้อความที่คุณวางใหม่ (' + parsed.length + ' วัน)';
+        importArea.classList.add('hidden');
+        renderTimeline();
+      } else {
+        rawItineraryInput.style.borderColor = '#e11d48';
+      }
+    });
+
+    renderTimeline();
+  </script>
 </body>
 </html>
