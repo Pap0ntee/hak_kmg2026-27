@@ -621,9 +621,8 @@
     /* Interactive Day Timeline */
     .day-tabs {
       display: flex;
+      flex-wrap: wrap; /* Wrap tabs cleanly to fit all devices without scrollbar */
       gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 4px;
       margin-bottom: 16px;
     }
     .day-tab {
@@ -642,13 +641,31 @@
       align-items: center;
       gap: 5px;
     }
+    .day-tab-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.2;
+    }
+    .day-tab-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .day-tab.active .day-tab-name {
+      color: #14532d !important;
+    }
+    .day-tab-date {
+      font-size: 12px;
+      font-weight: 600;
+    }
     .day-tab:hover {
       border-color: #94a3b8;
     }
     .day-tab.active {
-      background: var(--accent);
-      color: #ffffff;
-      border-color: var(--accent);
+      background: #bbf7d0 !important;
+      color: #14532d !important;
+      border-color: #86efac !important;
     }
     .day-dot {
       width: 6px;
@@ -1435,15 +1452,15 @@
       <!-- Hero Banner -->
       <header class="hero">
         <div class="hero-top">
-          <span class="sample-badge" id="dataModeBadge">แผนการเดินทางจริง (9 วัน)</span>
+          <span class="sample-badge" id="dataModeBadge">แผนการเดินทาง (9 วัน)</span>
         </div>
 
         <h1 style="font-size: clamp(22px, 3.8vw, 30px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; margin: 0 0 8px; color: #ffffff;">Trip to Haikou &amp; Kunming</h1>
-        <p>Dynamic Infographic สรุปเส้นทางและไฮไลท์สำคัญระหว่างเมืองชายฝั่งทะเลไห่หนาน <strong>ไหโข่ว (Haikou)</strong> และนครแห่งฤดูใบไม้ผลิ <strong>คุนหมิง (Kunming)</strong> มณฑลยูนนาน</p>
+        <p>สรุปเส้นทาง และไฮไลท์สำคัญ เมืองชายฝั่งทะเลไห่หนาน <strong>ไหโข่ว (Haikou)</strong> และนครแห่งฤดูใบไม้ผลิ <strong>คุนหมิง (Kunming)</strong> มณฑลยูนนาน</p>
 
         <div class="route-visual">
           <div class="route-node">
-            <div class="node-badge haikou">HK</div>
+            <div class="node-badge haikou">HAK</div>
             <div>
               <div class="node-title">Haikou (ไหโข่ว)</div>
               <div class="node-sub">Hainan Province • เมืองท่า &amp; สถาปัตยกรรมฉีโหลว</div>
@@ -1463,7 +1480,7 @@
               <div class="node-title">Kunming (คุนหมิง)</div>
               <div class="node-sub">Yunnan Province • วัดโบราณ &amp; ธรรมชาติยูนนาน</div>
             </div>
-            <div class="node-badge kunming">KM</div>
+            <div class="node-badge kunming">KMG</div>
           </div>
         </div>
       </header>
@@ -1493,25 +1510,7 @@
         <div class="section-header">
           <div>
             <h2 class="section-title">Interactive Timeline รายวัน (Day-by-Day Flow)</h2>
-            <p class="section-sub" id="timelineSubtitle">แผนการเดินทางจริงของคุณที่อัปเดตแล้ว (กดสลับวันเพื่อดูตารางเวลาและแผนที่)</p>
-          </div>
-          <button type="button" class="btn btn-secondary" id="toggleImportBtn" style="font-size: 12.5px;">
-            📝 แก้ไข/วางข้อความใหม่
-          </button>
-        </div>
-
-        <!-- Paste / Sync Custom Wanderlog Drawer -->
-        <div class="import-box hidden" id="importArea">
-          <strong>แก้ไขหรือนำเข้าแผนการเดินทางใหม่:</strong>
-          <p style="margin: 4px 0 12px; font-size: 13px; color: var(--muted);">
-            คุณสามารถคัดลอกตารางข้อความจาก Wanderlog มาวางทับในช่องด้านล่างนี้ได้ตลอดเวลาเพื่อสร้าง Timeline ใหม่ครับ
-          </p>
-          <textarea id="rawItineraryInput" class="import-textarea" placeholder="Day 1 - Haikou
-09:00 Haikou Old Town Quarter
-12:30 Qilou Snack Street"></textarea>
-          <div class="btn-row">
-            <button type="button" class="btn btn-primary" id="applyCustomBtn">สร้างแผนภาพจากข้อความใหม่</button>
-            <button type="button" class="btn btn-secondary" id="cancelImportBtn">ยกเลิก</button>
+            <p class="section-sub" id="timelineSubtitle">แผนการเดินทางคร่าวๆ(กดเลือกวันเพื่อดูตารางเวลา และสถานที่)</p>
           </div>
         </div>
 
@@ -2106,25 +2105,10 @@
 
     const dayTabsEl = document.getElementById('dayTabs');
     const timelineListEl = document.getElementById('timelineList');
-    const toggleImportBtn = document.getElementById('toggleImportBtn');
-    const importArea = document.getElementById('importArea');
-    const cancelImportBtn = document.getElementById('cancelImportBtn');
-    const rawItineraryInput = document.getElementById('rawItineraryInput');
-    const applyCustomBtn = document.getElementById('applyCustomBtn');
     const dataModeBadge = document.getElementById('dataModeBadge');
     const timelineSubtitle = document.getElementById('timelineSubtitle');
 
-    // Toggle Import Drawer
-    toggleImportBtn.addEventListener('click', () => {
-      importArea.classList.toggle('hidden');
-      if (!importArea.classList.contains('hidden')) {
-        rawItineraryInput.focus();
-      }
-    });
 
-    cancelImportBtn.addEventListener('click', () => {
-      importArea.classList.add('hidden');
-    });
 
     // Render Day Tabs & Timeline
     function renderTimeline() {
@@ -2133,10 +2117,24 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'day-tab' + (idx === activeDayIndex ? ' active' : '');
+        
+        // Split "Sat 26 Dec" into Day (Sat) and Date (26 Dec)
+        const parts = dayObj.dayLabel.split(' ');
+        const dayName = parts[0] || '';
+        const dayDate = parts.slice(1).join(' ') || '';
+
+        const inner = document.createElement('div');
+        inner.className = 'day-tab-inner';
+        inner.innerHTML = `
+          <span class="day-tab-name">${dayName}</span>
+          <span class="day-tab-date">${dayDate}</span>
+        `;
+        btn.appendChild(inner);
+
         const dot = document.createElement('span');
         dot.className = 'day-dot ' + (dayObj.city === 'haikou' ? 'haikou' : 'kunming');
         btn.appendChild(dot);
-        btn.appendChild(document.createTextNode(dayObj.dayLabel));
+
         btn.addEventListener('click', () => {
           activeDayIndex = idx;
           renderTimeline();
@@ -2204,24 +2202,6 @@
         timelineListEl.appendChild(card);
       });
     }
-
-    applyCustomBtn.addEventListener('click', () => {
-      const raw = rawItineraryInput.value.trim();
-      const parsed = parseCustomText(raw);
-      if (parsed && parsed.length > 0) {
-        currentItinerary = parsed;
-        activeDayIndex = 0;
-        dataModeBadge.textContent = 'ข้อมูลจากแผนอัปเดตใหม่เรียบร้อยแล้ว';
-        dataModeBadge.style.background = '#dcfce7';
-        dataModeBadge.style.color = '#166534';
-        dataModeBadge.style.borderColor = '#86efac';
-        timelineSubtitle.textContent = 'กำลังแสดงตารางการเดินทางจากข้อความที่คุณวางใหม่ (' + parsed.length + ' วัน)';
-        importArea.classList.add('hidden');
-        renderTimeline();
-      } else {
-        rawItineraryInput.style.borderColor = '#e11d48';
-      }
-    });
 
     renderTimeline();
   </script>
